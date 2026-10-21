@@ -1,0 +1,14 @@
+const fs=require('fs'),p='deathcomesafteryou part1/';
+let w=fs.readFileSync(p+'js/world.js','utf8');
+w=w.replace('// Exactly 2 x 2 repetitions within each original 4m cell (four tiles).','// One-metre repeats reduce the size of individual stones and grass details.');
+w=w.replace('const tileSize=2,','const tileSize=1,');
+w=w.replace('// World-space grass shading spans tile boundaries. No repeated flowers or rocks in the lawn.','// Actual grass/moss tiles form broad planting patches; texture detail stays visible.');
+w=w.replace("const id=type==='grass'?'grass':type==='trail'?'earth':pick(['paving','paving','broken-paving']);", "const patch=Math.abs(Math.sin(Math.floor(x/6)*12.9898+Math.floor(z/6)*78.233)*43758.5453)%1;\n const id=type==='grass'?(patch<.6?'grass':patch<.93?'moss-grass':'flowers'):type==='trail'?'dirt-track':pick(['paving','paving','broken-paving']);");
+fs.writeFileSync(p+'js/world.js',w);
+let s=fs.readFileSync(p+'js/scenery.js','utf8');
+s=s.replace('if(material<1.5){c.rgb=grass;}', 'if(material<1.5){c.rgb=mix(c.rgb*.85,grass,.28);}');
+s=s.replace('c.rgb=mix(grass,vec3(.32,.278,.182),.35+.23*noise(ground*.8));','c.rgb=mix(c.rgb*.82,mix(grass,vec3(.32,.278,.182),.6),.25);');
+fs.writeFileSync(p+'js/scenery.js',s);
+let v=fs.readFileSync(p+'verify-terrain.mjs','utf8').replace('ground.length,6400','ground.length,25600').replace('s.w===2&&s.d===2','s.w===1&&s.d===1').replace('s.w<=2&&s.d<=2','s.w<=1&&s.d<=1').replace('6,400 ground tiles at 2 x 2 per original cell','25,600 one-metre ground tiles with grass/moss/flower variation');
+v=v.replace("assert(!texturePages.includes", "assert(['grass','moss-grass','flowers'].every(id=>ground.some(s=>s.id===id)));\nassert(!texturePages.includes");
+fs.writeFileSync(p+'verify-terrain.mjs',v);

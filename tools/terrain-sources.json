@@ -1,0 +1,132 @@
+[
+  {
+    "id": "grass",
+    "page": "013",
+    "rect": [
+      735,
+      105,
+      80,
+      90
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "flowers",
+    "page": "013",
+    "rect": [
+      65,
+      954,
+      220,
+      220
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "earth",
+    "page": "013",
+    "rect": [
+      365,
+      356,
+      220,
+      220
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "worn-earth",
+    "page": "013",
+    "rect": [
+      662,
+      657,
+      224,
+      224
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "paving",
+    "page": "013",
+    "rect": [
+      349,
+      48,
+      253,
+      249
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "broken-paving",
+    "page": "013",
+    "rect": [
+      350,
+      646,
+      250,
+      242
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "stepping",
+    "page": "013",
+    "rect": [
+      350,
+      947,
+      250,
+      235
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "old-slab",
+    "page": "007",
+    "rect": [
+      350,
+      344,
+      250,
+      246
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "moss-grass",
+    "page": "007",
+    "rect": [
+      755,
+      660,
+      90,
+      90
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  },
+  {
+    "id": "dirt-track",
+    "page": "007",
+    "rect": [
+      967,
+      949,
+      235,
+      232
+    ],
+    "layer": "terrain",
+    "anchor": "center",
+    "collision": "separate world footprint"
+  }
+]

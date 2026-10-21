@@ -1,0 +1,1136 @@
+[
+  {
+    "id": "mausoleum",
+    "page": "014",
+    "rect": [
+      12,
+      18,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      8,
+      33,
+      314,
+      301,
+      72437
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "iron-panel",
+    "page": "014",
+    "rect": [
+      320,
+      18,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      336,
+      58,
+      296,
+      276,
+      53525
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "arch",
+    "page": "014",
+    "rect": [
+      638,
+      18,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      643,
+      43,
+      297,
+      291,
+      40882
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "gothic-shrine",
+    "page": "014",
+    "rect": [
+      947,
+      18,
+      295,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      957,
+      46,
+      283,
+      287,
+      60896
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "gate",
+    "page": "014",
+    "rect": [
+      12,
+      335,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      20,
+      347,
+      327,
+      273,
+      57136
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "ruined-wall",
+    "page": "014",
+    "rect": [
+      320,
+      335,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      359,
+      373,
+      282,
+      247,
+      46859
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "crypt-door",
+    "page": "014",
+    "rect": [
+      638,
+      335,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      659,
+      336,
+      269,
+      289,
+      57802
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "wall-end",
+    "page": "014",
+    "rect": [
+      947,
+      335,
+      295,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      947,
+      353,
+      287,
+      273,
+      48371
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "mourning-angel",
+    "page": "014",
+    "rect": [
+      12,
+      628,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      23,
+      629,
+      263,
+      292,
+      43326
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "sarcophagus",
+    "page": "014",
+    "rect": [
+      320,
+      628,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      312,
+      707,
+      316,
+      214,
+      49460
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "balustrade",
+    "page": "014",
+    "rect": [
+      638,
+      628,
+      302,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      649,
+      709,
+      324,
+      209,
+      46376
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "broken-column",
+    "page": "014",
+    "rect": [
+      947,
+      628,
+      295,
+      300
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      988,
+      648,
+      243,
+      270,
+      39224
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "gothic-window",
+    "page": "014",
+    "rect": [
+      12,
+      925,
+      302,
+      306
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      15,
+      933,
+      292,
+      285,
+      58015
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "corner-wall",
+    "page": "014",
+    "rect": [
+      320,
+      925,
+      302,
+      306
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      316,
+      944,
+      297,
+      274,
+      53796
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "broken-fence",
+    "page": "014",
+    "rect": [
+      638,
+      925,
+      302,
+      306
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      627,
+      975,
+      307,
+      235,
+      46441
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "columbarium",
+    "page": "014",
+    "rect": [
+      947,
+      925,
+      295,
+      306
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      945,
+      939,
+      295,
+      279,
+      72190
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "headstone",
+    "page": "015",
+    "rect": [
+      5,
+      8,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      25,
+      43,
+      277,
+      282,
+      51967
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "cross",
+    "page": "015",
+    "rect": [
+      315,
+      8,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      349,
+      33,
+      246,
+      296,
+      43096
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "broken-stone",
+    "page": "015",
+    "rect": [
+      625,
+      8,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      634,
+      86,
+      281,
+      255,
+      46257
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "angel",
+    "page": "015",
+    "rect": [
+      935,
+      8,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      954,
+      45,
+      263,
+      303,
+      62276
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "lantern",
+    "page": "015",
+    "rect": [
+      5,
+      318,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      33,
+      352,
+      248,
+      269,
+      37916
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "shovel",
+    "page": "015",
+    "rect": [
+      315,
+      318,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      323,
+      347,
+      272,
+      288,
+      34310
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "open-grave",
+    "page": "015",
+    "rect": [
+      625,
+      318,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      632,
+      383,
+      307,
+      247,
+      55631
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "coffin",
+    "page": "015",
+    "rect": [
+      935,
+      318,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      963,
+      382,
+      277,
+      253,
+      51179
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "dead-shrub",
+    "page": "015",
+    "rect": [
+      5,
+      628,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      31,
+      647,
+      243,
+      288,
+      31874
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "small-fence",
+    "page": "015",
+    "rect": [
+      315,
+      628,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      302,
+      659,
+      330,
+      276,
+      53468
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "urn",
+    "page": "015",
+    "rect": [
+      625,
+      628,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      685,
+      659,
+      210,
+      287,
+      39114
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "raven",
+    "page": "015",
+    "rect": [
+      935,
+      628,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      958,
+      665,
+      259,
+      281,
+      37906
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "sign",
+    "page": "015",
+    "rect": [
+      5,
+      938,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      25,
+      943,
+      250,
+      279,
+      40500
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "candles",
+    "page": "015",
+    "rect": [
+      315,
+      938,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      331,
+      975,
+      270,
+      243,
+      35776
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "bones",
+    "page": "015",
+    "rect": [
+      625,
+      938,
+      305,
+      302
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      638,
+      1025,
+      291,
+      193,
+      38166
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "blood",
+    "page": "015",
+    "rect": [
+      945,
+      1000,
+      295,
+      220
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      1001,
+      1033,
+      221,
+      127,
+      16557
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "vine",
+    "page": "016",
+    "rect": [
+      30,
+      85,
+      650,
+      255
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      49,
+      101,
+      641,
+      231,
+      60676
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "grass-tuft",
+    "page": "016",
+    "rect": [
+      715,
+      120,
+      208,
+      220
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      728,
+      148,
+      181,
+      170,
+      14489
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "wildflowers",
+    "page": "016",
+    "rect": [
+      945,
+      98,
+      285,
+      245
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      964,
+      116,
+      221,
+      222,
+      20632
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "bush",
+    "page": "016",
+    "rect": [
+      32,
+      395,
+      290,
+      245
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      49,
+      422,
+      271,
+      202,
+      29335
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "brush",
+    "page": "016",
+    "rect": [
+      350,
+      365,
+      280,
+      280
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      369,
+      380,
+      244,
+      237,
+      19331
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "thicket",
+    "page": "016",
+    "rect": [
+      650,
+      390,
+      580,
+      520
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      644,
+      404,
+      568,
+      492,
+      186933
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "tall-grass",
+    "page": "016",
+    "rect": [
+      30,
+      665,
+      590,
+      235
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      49,
+      668,
+      566,
+      223,
+      70245
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "roots",
+    "page": "016",
+    "rect": [
+      940,
+      945,
+      290,
+      265
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      965,
+      963,
+      254,
+      226,
+      29462
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "oak",
+    "page": "017",
+    "rect": [
+      22,
+      15,
+      610,
+      680
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      34,
+      32,
+      632,
+      651,
+      258432
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "dead-tree",
+    "page": "017",
+    "rect": [
+      640,
+      38,
+      590,
+      662
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      662,
+      67,
+      558,
+      628,
+      141113
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "pine",
+    "page": "017",
+    "rect": [
+      50,
+      705,
+      550,
+      525
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      87,
+      689,
+      491,
+      527,
+      141916
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "fallen-log",
+    "page": "017",
+    "rect": [
+      635,
+      725,
+      590,
+      250
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      641,
+      743,
+      564,
+      218,
+      77679
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "stump",
+    "page": "017",
+    "rect": [
+      630,
+      1004,
+      290,
+      226
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      645,
+      1024,
+      261,
+      178,
+      29202
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "sapling",
+    "page": "017",
+    "rect": [
+      950,
+      980,
+      270,
+      250
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      972,
+      984,
+      187,
+      227,
+      21458
+    ],
+    "mode": "component"
+  },
+  {
+    "id": "rubble",
+    "page": "018",
+    "rect": [
+      22,
+      40,
+      600,
+      660
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      48,
+      62,
+      571,
+      615,
+      255176
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "wall-rubble",
+    "page": "018",
+    "rect": [
+      640,
+      135,
+      590,
+      290
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      642,
+      149,
+      569,
+      253,
+      95855
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "bricks",
+    "page": "018",
+    "rect": [
+      650,
+      450,
+      280,
+      225
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      708,
+      468,
+      155,
+      181,
+      13888
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "stones",
+    "page": "018",
+    "rect": [
+      950,
+      440,
+      280,
+      245
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      979,
+      454,
+      223,
+      196,
+      25019
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "wrecked-fence",
+    "page": "018",
+    "rect": [
+      20,
+      710,
+      610,
+      250
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      42,
+      714,
+      577,
+      234,
+      70123
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "glass",
+    "page": "018",
+    "rect": [
+      660,
+      715,
+      255,
+      245
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      701,
+      992,
+      214,
+      200,
+      24845
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "timbers",
+    "page": "018",
+    "rect": [
+      20,
+      995,
+      600,
+      230
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      56,
+      997,
+      538,
+      202,
+      69482
+    ],
+    "mode": "region"
+  },
+  {
+    "id": "debris",
+    "page": "018",
+    "rect": [
+      950,
+      990,
+      280,
+      240
+    ],
+    "layer": "prop",
+    "anchor": "bottom-center",
+    "collision": "separate world footprint",
+    "component": [
+      965,
+      982,
+      248,
+      225,
+      35198
+    ],
+    "mode": "region"
+  }
+]

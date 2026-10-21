@@ -1,0 +1,1 @@
+// Family-matched borders make atlas variants connect without rotating cut stone edges.
