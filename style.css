@@ -63,3 +63,4 @@ body.hud-off #objective,body.hud-off #map,body.hud-off #announcement,body.hud-of
 @keyframes intro-words{0%,74%{opacity:0;visibility:hidden}100%{opacity:1;visibility:visible}}
 @keyframes intro-shade{0%,74%{opacity:0}100%{opacity:1}}
 @media(prefers-reduced-motion:reduce){#introMenu .story-panel,#introMenu:before{animation-timing-function:steps(1,end)}}
+#introMenu #introSound{display:block;font-size:11px;color:#c6bea9;margin-top:16px;border:0;padding:6px 0}
