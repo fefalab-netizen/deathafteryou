@@ -1,0 +1,214 @@
+import {PickupGlow} from './pickup-glow.js';
+import {WEAPONS} from './weapons.js';
+import {CrowdRenderer} from './crowd.js';
+import {CorpseSprites} from './corpses.js';
+import {SceneryRenderer} from './scenery.js';
+import {TYPES,SHIRT_COLORS} from './zombies.js';
+import {BAT} from './combat.js';
+import {V,I,mm,transform,translate,scaled,rotX,rotY,ortho,lookAt,rigPose,armFrame,project,exampleLibrary,clone,interpolate,gait} from './spriteforge.js';
+
+export const colors={asphalt:'#393636',concrete:'#8c887b',line:'#b9ac79',olive:'#646b49',rust:'#75513c',dark:'#292b28',blood:'#84332e'};
+const rgb=c=>c.match(/\w\w/g).map(n=>parseInt(n,16)/255);
+function boxGeometry(){const out=[];for(let a=0;a<3;a++)for(const s of [-1,1]){const b=(a+1)%3,c=(a+2)%3,n=[0,0,0];n[a]=s;const p=[[-1,-1],[1,-1],[1,1],[-1,1]].map(([u,v])=>{const r=[0,0,0];r[a]=s;r[b]=u;r[c]=v;return r;});for(const i of [0,1,2,0,2,3])out.push(...p[i],...n);}return out;}
+function sphereGeometry(){const out=[],point=(u,v)=>[Math.sin(v)*Math.cos(u),Math.cos(v),Math.sin(v)*Math.sin(u)];for(let j=0;j<4;j++)for(let i=0;i<8;i++){const a=point(i/8*Math.PI*2,j/4*Math.PI),b=point((i+1)/8*Math.PI*2,j/4*Math.PI),c=point((i+1)/8*Math.PI*2,(j+1)/4*Math.PI),d=point(i/8*Math.PI*2,(j+1)/4*Math.PI);for(const tri of [[a,b,c],[a,c,d]]){const n=V.unit(V.add(V.add(...tri.slice(0,2)),tri[2]));for(const p of tri)out.push(...p,...n);}}return out;}
+const BOX=boxGeometry(),SPHERE=sphereGeometry();
+// Square cross-section with small clipped corners; flat normals keep broad faces readable.
+function bevelGeometry(sides=8){
+ const ring=[[-.78,-1],[.78,-1],[1,-.78],[1,.78],[.78,1],[-.78,1],[-1,.78],[-1,-.78]].filter((_,i)=>i%(8/sides)===0),out=[];
+ const triangle=(a,b,c,n)=>{for(const p of [a,b,c])out.push(...p,...n);};
+ for(let i=0;i<sides;i++){const [x,z]=ring[i],[xx,zz]=ring[(i+1)%sides],n=V.unit([zz-z,0,x-xx]);
+  triangle([x,-1,z],[xx,-1,zz],[xx,1,zz],n);triangle([x,-1,z],[xx,1,zz],[x,1,z],n);
+  for(const y of [-1,1])triangle([0,y,0],[x,y,z],[xx,y,zz],[0,y,0]);
+ }return out;
+}
+const DETAIL=bevelGeometry();
+const zombieGeometry=new Map([[DETAIL,bevelGeometry(4)]]);
+const BEVEL=profileGeometry([[-1,.78,.78],[-.78,1,1],[.78,1,1],[1,.78,.78]]);
+// Sculpted planar profiles: cheekbones, jaw, shoulder taper and cloth folds.
+// Player profiles have sixteen sides; zombie profiles use six. Both retain the contour rings.
+function profileGeometry(rings,sides=16){
+ const sourceRings=rings;
+ const outline=Array.from({length:sides},(_,i)=>{const a=i*Math.PI*2/sides;return [Math.sign(Math.cos(a))*Math.pow(Math.abs(Math.cos(a)),.48),Math.sign(Math.sin(a))*Math.pow(Math.abs(Math.sin(a)),.48)];}),out=[];
+ // Additional contour rings shape the silhouette instead of subdividing flat faces.
+ const expanded=[];for(let i=0;i<rings.length;i++){expanded.push(rings[i]);if(i<rings.length-1){const a=rings[i],b=rings[i+1];expanded.push([(a[0]+b[0])/2,(a[1]+b[1])*.505,(a[2]+b[2])*.505,((a[3]||0)+(b[3]||0))/2]);}}
+ rings=expanded;
+ const rows=rings.map(r=>outline.map(([x,z])=>[x*r[1],r[0],z*r[2]+(r[3]||0)]));
+ const tri=(a,b,c)=>{const n=V.unit(V.cross(V.sub(b,a),V.sub(c,a)));for(const p of [a,b,c])out.push(...p,...n);};
+ for(let k=0;k<rows.length-1;k++)for(let i=0;i<sides;i++){const j=(i+1)%sides;tri(rows[k][i],rows[k+1][i],rows[k+1][j]);tri(rows[k][i],rows[k+1][j],rows[k][j]);}
+ for(const k of [0,rows.length-1])for(let i=0;i<sides;i++){const a=[0,rings[k][0],rings[k][3]||0];if(k===0)tri(a,rows[k][i],rows[k][(i+1)%sides]);else tri(a,rows[k][(i+1)%sides],rows[k][i]);}
+ if(sides===16)zombieGeometry.set(out,profileGeometry(sourceRings,6));
+ return out;
+}
+const HEAD=profileGeometry([[-1,.46,.60,.16],[-.72,.72,.78,.07],[-.25,.88,.91,0],[.12,1,.92,0],[.50,.93,.93,-.03],[.83,.79,.85,-.07],[1,.55,.61,-.08]]);
+const TORSO=profileGeometry([[-1,.70,.81],[-.55,.80,.88],[.12,1,.97],[.65,1,.89],[1,.70,.69]]);
+const LIMB=profileGeometry([[-1,.69,.70],[-.72,.78,.84],[-.1,.9,.96],[.50,1,.94],[1,.85,.82]]);
+export function bake(parts){const out=[];for(const p of parts){const m=p.m,col=rgb(p.color||'#888877'),geo=p.geometry||(p.box===false?SPHERE:BOX),cols=[0,4,8].map(k=>[m[k],m[k+1],m[k+2]]),nm=cols.map(v=>V.scale(v,1/Math.max(.00001,V.dot(v,v))));for(let i=0;i<geo.length;i+=6){const v=transform(m,geo.slice(i,i+3)),n=V.unit([0,1,2].map(k=>nm[0][k]*geo[i+3]+nm[1][k]*geo[i+4]+nm[2][k]*geo[i+5]));out.push(...v,...n,...col);}}return new Float32Array(out);}
+export function block(x,y,z,w,h,d,color,yaw=0){return {m:scaled(mm(translate([x,y,z]),rotY(yaw)),[w/2,h/2,d/2]),color};}
+const clips=new Map(exampleLibrary().map(c=>[c.id,c])),cache=new Map();let cacheBytes=0;const CACHE_BYTE_LIMIT=48*1024*1024;
+const shirtRGB=SHIRT_COLORS.map(c=>c?rgb(c):null);
+export const DEATH_SETTLE_TIME=(clips.get('hit').frames.length-1)/clips.get('hit').fps;
+export const MUZZLE=[.21,1.19,.87];
+export function muzzlePosition(a){const clock=a.moving?a.animation:(a.idleAnimation||0),m=characterMesh('human','shoot',0,a.moving,a.moveYaw||0,clock,a.weapon||'pistol').muzzle||MUZZLE,c=Math.cos(a.yaw),s=Math.sin(a.yaw);return [a.x+c*m[0]+s*m[2],m[1],a.z-s*m[0]+c*m[2]];}
+// 24 Hz interpolated source poses. Geometry stays shared across actors of the same type.
+export function characterMesh(kind,state,time,moving,moveYaw=0,locomotionTime=time,weapon='pistol',shirtVariant=0){
+ const zombie=kind!=='human',melee=WEAPONS[weapon]?.type==='melee',type=TYPES[kind]||TYPES.normal;
+ const id=state==='dead'||state==='hit'?'hit':zombie?(kind==='runner'?'zombie-feral':'zombie'):moving?'walk':'idle';
+ const clip=clips.get(id),oneShot=state==='dead'||state==='hit',duration=(clip.frames.length-1)/clip.fps;
+ const baseTime=!oneShot?locomotionTime:time;
+ const directionalWalk=!zombie&&moving&&!oneShot;
+ const tick=Math.floor((oneShot?Math.min(time,duration):baseTime%(directionalWalk?1:clip.frames.length/clip.fps))*24);
+ const phase=oneShot&&time>=duration?duration:tick/24,frame=phase*clip.fps,f=Math.min(Math.floor(frame),clip.frames.length-1),next=oneShot?Math.min(f+1,clip.frames.length-1):(f+1)%clip.frames.length;
+ const direction=directionalWalk?((Math.round(moveYaw/(Math.PI/8))%16)+16)%16:0;
+ const action=state==='swing'?Math.min(23,Math.floor(time/BAT.duration*24)):state==='attack'?Math.min(15,Math.floor(time*16)):state==='shoot'?Math.min(5,Math.floor(time*30)):state==='reload'?Math.min(23,Math.floor(time*18)):0;
+ const key=[kind,weapon,state,id,moving,tick,direction,action,oneShot&&time>=duration].join(':');if(cache.has(key)){const mesh=cache.get(key);cache.delete(key);cache.set(key,mesh);return mesh;}
+ let p=directionalWalk?gait('walk',phase):interpolate(clip.frames[f],clip.frames[next],frame-f);
+ if(directionalWalk){
+  // Move the foot targets relative to fixed hips. The pelvis and feet keep the
+  // torso's heading, including side steps and backward diagonal steps.
+  const angle=direction*Math.PI/8;
+  for(const side of ['L','R']){const foot=p.feet[side],stride=foot[2];foot[0]+=stride*Math.sin(angle)*.65;foot[2]=stride*Math.cos(angle);}
+ }
+ if(!zombie&&state!=='dead'&&state!=='hit'){
+  const aim=clips.get('aim-pistol').frames[0];
+  for(const j of ['torso','head','upperArmL','upperArmR','forearmL','forearmR','handL','handR'])p.angles[j]=clone(aim.angles[j]);
+  p.angles.torso=[2,0,0];p.angles.head=[0,0,0];p.angles.upperArmR=[-86,-5,0];p.angles.forearmR=[-8,0,0];p.angles.handR=[0,0,0];p.weapon='';p.support=false;
+  const recoil=state==='shoot'?Math.pow(1-action/5,2)*8:0;
+  p.angles.upperArmR[0]-=recoil;p.angles.forearmR[0]-=recoil;
+  if(state==='reload'){const reach=Math.sin(action/23*Math.PI);p.angles.upperArmR[0]+=38*reach;p.angles.forearmR[0]-=57*reach;p.angles.upperArmL[0]+=25*reach;p.angles.forearmL[0]-=15*reach;p.angles.head=[15*reach,0,0];}
+  if(melee){
+   const swing=clips.get('sweep-club'),pos=state==='swing'?action/23*(swing.frames.length-1):0,i=Math.floor(pos),q=interpolate(swing.frames[i],swing.frames[Math.min(i+1,swing.frames.length-1)],pos-i);
+   for(const j of ['torso','head','upperArmL','upperArmR','forearmL','forearmR','handL','handR'])p.angles[j]=q.angles[j];if(weapon==='knife'){const thrust=state==='swing'?Math.sin(action/23*Math.PI):0;p.angles.upperArmR=[-45-55*thrust,-8,0];p.angles.forearmR=[-70+65*thrust,0,0];p.angles.upperArmL=[-15,0,0];p.angles.forearmL=[-25,0,0];}
+  }
+ }
+ if(zombie&&state!=='hit'&&state!=='dead'){
+  p.angles.head[1]+=Math.sin(phase*4)*4;
+  if(state==='windup'){p.root[1]-=.15;p.angles.torso=[32,0,0];p.angles.upperArmL=[25,-15,0];p.angles.upperArmR=[25,15,0];}
+  if(kind==='brute'||kind==='wrecker'){p.angles.torso=[19,0,Math.sin(phase*3)*3];p.angles.upperArmL=[-18,-18,0];p.angles.upperArmR=[-22,18,0];}
+  if(kind==='worker'){p.angles.upperArmL=[-38,-12,0];p.angles.upperArmR=[-43,12,0];}
+  if(kind==='crawler'){
+   const cycle=phase*7;p.root[1]=.29;p.angles.torso=[72,0,Math.sin(cycle)*5];p.angles.head=[-45,0,0];p.feet={};
+   p.angles.thighL=[-60+15*Math.sin(cycle),-12,0];p.angles.thighR=[-60-15*Math.sin(cycle),12,0];p.angles.shinL=[110,0,0];p.angles.shinR=[110,0,0];
+   p.angles.upperArmL=[-30+22*Math.sin(cycle),-12,0];p.angles.upperArmR=[-30-22*Math.sin(cycle),12,0];p.angles.forearmL=[-40,0,0];p.angles.forearmR=[-40,0,0];
+  }
+  if(state==='attack'){
+   const t=action/16,wind=Math.min(1,t/.28),strike=Math.max(0,(t-.28)/.17),arm=t<.28?-65-60*wind:t<.45?-125+105*Math.min(1,strike):-20-45*Math.min(1,(t-.45)/.5);
+   p.angles.upperArmL=[arm,-15,0];p.angles.upperArmR=[arm,15,0];p.angles.forearmL=[-20,0,0];p.angles.forearmR=[-20,0,0];p.angles.torso[0]+=t<.45?-10*wind:22*Math.min(1,strike);
+  }
+ }
+ if(kind==='crawler'&&(state==='hit'||state==='dead')){p.root[1]=.29;p.angles.torso=[72,0,0];p.angles.head=[-45,0,0];p.feet={};for(const side of ['L','R']){p.angles['thigh'+side]=[-60,0,0];p.angles['shin'+side]=[110,0,0];}}
+ if(!zombie&&weapon==='bat'){
+  if(state!=='swing'&&state!=='dead'&&state!=='hit'){p.angles.torso=[2,0,0];p.angles.upperArmR=[-53.5,-4.5,0];p.angles.forearmR=[-120.5,10,7.5];p.angles.handR=[-65,35,-2.5];}
+  p.weapon='club';p.weaponHand='R';p.support=true;p.supportPasses=32;
+ }
+ const rig=rigPose(p),parts=[];let muzzle=null;
+ // Keep the supporting hand locked to the handle after the shoulder solver.
+ // A small forearm reach correction preserves the authored attack trajectory.
+ if(!zombie&&weapon==='bat'){
+  const right=armFrame(rig.p,'R'),target=transform(mm(translate(right.center),right.m),[0,.075,0]);
+  const wrist=transform(mm(translate(target),right.m),[0,.07,0]);
+  const hand=rig.parts.find(a=>a.name==='handL'),forearm=rig.parts.find(a=>a.name==='forearmL'),joint=rig.parts.find(a=>a.name==='wristL');
+  const size=m=>[0,4,8].map(i=>Math.hypot(m[i],m[i+1],m[i+2]));
+  if(hand)hand.m=scaled(mm(translate(target),right.m),size(hand.m));
+  if(joint){joint.m[12]=wrist[0];joint.m[13]=wrist[1];joint.m[14]=wrist[2];}
+  if(forearm){
+   const elbow=rig.joints.forearmL.start,y=V.unit(V.sub(elbow,wrist)),x=V.unit(V.cross(y,Math.abs(y[2])<.95?[0,0,1]:[1,0,0])),z=V.cross(x,y);
+   const basis=I();for(let k=0;k<3;k++){basis[k]=x[k];basis[4+k]=y[k];basis[8+k]=z[k];}
+   const dimensions=size(forearm.m);dimensions[1]=Math.hypot(...V.sub(elbow,wrist))*.49;
+   forearm.m=scaled(mm(translate(V.scale(V.add(elbow,wrist),.5)),basis),dimensions);
+  }
+ }
+ const detail=(parent,pos,size,color,box=true)=>parts.push({m:mm(parent,scaled(translate(pos),size)),color,box,geometry:box?DETAIL:undefined});
+ for(const original of rig.parts){if(original.name.startsWith('prop-'))continue;const part={...original},name=part.name;
+  let color=zombie?type.skin:'#b99b7c';
+  if(/torso|abdomen|upperArm|shoulder|waist/.test(name))color=zombie?type.shirt:'#626b4e';
+  if(/pelvis|thigh|shin|hip|knee/.test(name))color=zombie?type.pants:'#515963';
+  if(/foot|ankle/.test(name))color=zombie?(kind==='worker'?'#514b40':type.skin):'#66503c';
+  if(zombie&&/hand/.test(name))color='#853e36';
+  parts.push({...part,color,box:true,geometry:name==='head'?HEAD:/torso|abdomen/.test(name)?TORSO:/upperArm|forearm|thigh|shin/.test(name)?LIMB:BEVEL});
+  if(name==='head'){
+   if(kind==='wrecker'){detail(part.m,[-.5,.25,.9],[.42,.65,.16],'#6b7165');detail(part.m,[.5,-.5,.9],[.35,.28,.18],'#853d32');}
+   detail(part.m,[0,.05,1.02],[.16,.28,.22],zombie?'#a2977d':'#b39676');
+   for(const s of [-1,1]){
+    detail(part.m,[s*.50,.31,.86],[.29,.10,.16],zombie?'#827d65':'#836d54');
+    detail(part.m,[s*.68,-.19,.69],[.21,.18,.17],zombie?'#a2957a':'#b09576');
+    detail(part.m,[s*.94,-.03,.03],[.14,.24,.16],color);
+   }
+   if(!zombie||kind==='runner'||kind==='brute')for(const [x,y,z] of [[-.55,.8,.3],[.1,.95,.1],[.55,.82,-.2],[-.4,.78,-.6]])detail(part.m,[x,y,z],[.28,.23,.32],'#564536');
+   if(!zombie||kind==='runner'||kind==='brute')detail(part.m,[0,.7,-.1],[1.06,.42,1.02],'#443a32');
+   for(const x of [-.42,.42]){detail(part.m,[x,.1,.88],[.24,.18,.14],'#34332c');detail(part.m,[x,.12,1],[.085,.055,.04],zombie?'#d9c690':'#b4ba9e');}
+   detail(part.m,[0,-.55,.8],[.55,.23,.23],zombie?'#81382e':'#51402f');
+   if(zombie)for(const x of [-.25,0,.25])detail(part.m,[x,-.46,1.01],[.07,.08,.04],'#d2c3a2');
+   if(kind==='worker'){detail(part.m,[0,.77,0],[1.2,.55,1.15],'#c29442');detail(part.m,[0,.43,.12],[1.4,.1,1.35],'#a77731');}
+  }
+  if(name==='torso'){
+   if(kind==='wrecker'){for(const s of [-1,1])detail(part.m,[s*.85,.6,0],[.4,.4,1.1],'#666d63');detail(part.m,[0,0,.94],[.9,.8,.15],'#554f40');for(const x of [-.55,0,.55])detail(part.m,[x,0,1.12],[.12,.7,.06],'#b59a53');}
+   if(kind==='wrecker')detail(part.m,[0,-.35,.3],[1.1,.9,1.2],'#95816b');
+   if(!zombie){for(const s of [-1,1]){detail(part.m,[s*.52,.48,.82],[.27,.19,.10],'#73775a');detail(part.m,[s*.48,-.60,.8],[.28,.18,.10],'#505b43');}detail(part.m,[0,-.88,.15],[.82,.09,.85],'#453e30');detail(part.m,[0,-.87,1.02],[.13,.09,.04],'#aaa086');}
+   
+   else{detail(part.m,[.5,.3,.86],[.33,.3,.12],'#84332e');detail(part.m,[-.25,-.5,.85],[.3,.18,.12],'#74392f');}
+   if(kind==='worker')for(const x of [-.6,.6]){detail(part.m,[x,0,.88],[.22,.96,.12],'#cf8d3f');detail(part.m,[x,0,1.01],[.08,.96,.03],'#d3c9a7');}
+   if(kind==='brute')detail(part.m,[0,-.35,.3],[1.1,.9,1.2],'#bfa991');
+  }
+  if(name==='thighR'&&!zombie)detail(part.m,[.1,-.55,.85],[.55,.2,.15],'#b99b7c');
+  if(kind==='wrecker'&&/forearm|hand/.test(name))detail(part.m,[0,0,0],[1.4,1.05,1.4],'#776957');
+ }
+ if(!zombie&&state!=='dead'&&melee){
+  const hand=armFrame(rig.p,'R'),bat=mm(translate(hand.center),hand.m);
+  if(weapon==='knife'){for(const b of [block(0,-.06,0,.065,.19,.065,'#5c4938'),block(0,-.17,0,.16,.035,.08,'#9a9d8f'),block(0,-.34,0,.065,.31,.025,'#d0d1ba')])parts.push({...b,m:mm(bat,b.m)});}else{
+  for(const [y,width,length,col] of [[0,.045,.26,'#5a4130'],[-.34,.066,.44,'#8b6440'],[-.70,.105,.38,'#a27a4b'],[-.91,.09,.06,'#715237']])parts.push({m:mm(bat,scaled(translate([0,y,0]),[width,length/2,width])),color:col,geometry:LIMB});
+  for(let y=-.10;y<.10;y+=.05)parts.push({m:mm(bat,scaled(translate([0,y,0]),[.048,.012,.048])),color:'#bcb291',geometry:BEVEL});
+  if(['hatchet','hammer','shovel','machete','crowbar'].includes(weapon)){const shape={hatchet:[.13,-.83,0,.30,.22,.04],hammer:[0,-.85,0,.42,.20,.18],shovel:[0,-.92,0,.28,.34,.025],machete:[.02,-.67,0,.12,.62,.025],crowbar:[.10,-.95,0,.22,.07,.07]}[weapon];const [x,y,z,w,h,d]=shape;parts.push({m:mm(bat,scaled(translate([x,y,z]),[w,h,d])),color:'#929889',geometry:DETAIL});}
+ } }
+ if(!zombie&&state!=='dead'&&!melee){
+  // Barrel faces the same local +Z direction used by the ballistic ray.
+  const hand=armFrame(rig.p,'R'),grip=V.add(hand.center,[0,.06,.08]);
+  const gun=mm(translate(grip),state==='reload'||state==='hit'?mm(hand.m,rotX(90)):rotX(state==='shoot'?-8*Math.pow(1-action/5,2):0));
+  const long=['shotgun','doublebarrel','carbine','rifle','smg'].includes(weapon);muzzle=transform(gun,[0,0,long?.65:.21]);if(long){parts.push({m:mm(gun,scaled(translate([0,0,.35]),[.055,.055,.34])),color:'#4b514d',geometry:DETAIL});parts.push({m:mm(gun,scaled(translate([0,-.03,-.22]),[.08,.10,.20])),color:'#735a40',geometry:DETAIL});}
+  for(const b of [block(0,0,0,.09,.095,.42,'#333a3c'),block(0,-.1,-.10,.075,.18,.10,'#443c32'),block(0,.058,-.1,.04,.025,.04,'#929284')])parts.push({...b,m:mm(gun,b.m)});
+ }
+ if(zombie)for(const part of parts)part.geometry=zombieGeometry.get(part.geometry)||part.geometry;
+ const proportions=zombie?scaled(I(),type.scale):I();
+ let fall=I();if(state==='dead'){const progress=Math.min(1,phase/duration);fall=mm(translate([0,.20*progress,0]),rotX((kind==='crawler'?12:88)*progress));}
+ for(const part of parts)part.m=mm(fall,mm(proportions,part.m));
+ // Place death poses on the ground using their actual geometry, not a guessed offset.
+ if(state==='dead'){let lowest=Infinity;for(const part of parts){const geo=part.geometry||BOX;for(let i=0;i<geo.length;i+=6)lowest=Math.min(lowest,transform(part.m,geo.slice(i,i+3))[1]);}if(lowest<.025)for(const part of parts)part.m[13]+=.025-lowest;}
+ const mesh=bake(parts);mesh.muzzle=muzzle;if(!zombie&&weapon==='bat'){const r=armFrame(rig.p,'R'),l=armFrame(rig.p,'L'),target=transform(mm(translate(r.center),r.m),[0,.075,0]);const hand=rig.parts.find(a=>a.name==='handL');mesh.batGripGap=Math.hypot(...V.sub(hand.m.slice(12,15),target));}mesh.shirtBase=zombie?rgb(type.shirt):null;cache.set(key,mesh);cacheBytes+=mesh.byteLength;
+ // Bound pose memory; cache hits refresh recency so active poses outlive stale ones.
+ while(cache.size>480||cacheBytes>CACHE_BYTE_LIMIT){const oldest=cache.keys().next().value;cacheBytes-=cache.get(oldest).byteLength;cache.delete(oldest);}
+ return mesh;
+}
+// Internal canvas pixels are independent of CSS size and device pixel density.
+export function renderDimensions(width,height,scale=.5){const s=Math.max(.25,Math.min(1,Number(scale)||.5));return [Math.max(1,Math.round(width*s)),Math.max(1,Math.round(height*s))];}
+export class WorldRenderer{
+ constructor(canvas){this.canvas=canvas;const g=this.g=canvas.getContext('webgl',{alpha:false,antialias:false});if(!g)throw new Error('WebGL is unavailable. Try a browser with hardware acceleration enabled.');
+ const vs='attribute vec3 pos;attribute vec3 normal;attribute vec3 color;uniform mat4 vp;varying vec3 c;varying vec2 worldXZ;void main(){worldXZ=pos.xz;float light=.48+.52*max(dot(normalize(normal),normalize(vec3(-.6,1.,.5))),0.);c=color*light;gl_Position=vp*vec4(pos,1.);}';
+ const fs='precision mediump float;varying vec3 c;varying vec2 worldXZ;uniform float dark;uniform vec2 lamp;uniform sampler2D shadows;void main(){vec2 delta=worldXZ-lamp;float d=length(delta);float angle=atan(delta.y,delta.x)/6.2831853+.5;float stop=texture2D(shadows,vec2(angle,.5)).r*16.;float visible=1.-smoothstep(stop+.05,stop+.22,d);float halo=1.-smoothstep(2.,11.,d);float illumination=halo*visible;vec3 lit=c*vec3(1.12,1.06,.91)*illumination;gl_FragColor=vec4(mix(c,lit,dark),1.);}';
+ const shader=(type,src)=>{const s=g.createShader(type);g.shaderSource(s,src);g.compileShader(s);if(!g.getShaderParameter(s,g.COMPILE_STATUS))throw Error(g.getShaderInfoLog(s));return s;};
+ this.program=g.createProgram();g.attachShader(this.program,shader(g.VERTEX_SHADER,vs));g.attachShader(this.program,shader(g.FRAGMENT_SHADER,fs));g.linkProgram(this.program);if(!g.getProgramParameter(this.program,g.LINK_STATUS))throw Error(g.getProgramInfoLog(this.program));g.useProgram(this.program);this.vpLocation=g.getUniformLocation(this.program,'vp');this.darkLocation=g.getUniformLocation(this.program,'dark');this.lampLocation=g.getUniformLocation(this.program,'lamp');this.shadowLocation=g.getUniformLocation(this.program,'shadows');this.shadowTexture=g.createTexture();g.bindTexture(g.TEXTURE_2D,this.shadowTexture);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.NEAREST);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);this.shadowPixels=new Uint8Array(512*4);this.shadowPixels.fill(255);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,512,1,0,g.RGBA,g.UNSIGNED_BYTE,this.shadowPixels);this.dark=false;this.lamp=[0,0];this.attrs=['pos','normal','color'].map(n=>g.getAttribLocation(this.program,n));for(const a of this.attrs)g.enableVertexAttribArray(a);g.enable(g.DEPTH_TEST);this.staticBuffer=g.createBuffer();this.dynamicBuffer=g.createBuffer();this.dynamic=new Float32Array(2000000);this.used=0;this.target=[0,0,0];this.half=10;this.corpses=new CorpseSprites(this);this.crowd=new CrowdRenderer(this,fs);this.pickupGlow=new PickupGlow(g);
+ }
+ setScenery(items){if(this.scenery?.items===items)return;this.scenery=new SceneryRenderer(this.g,items);this.scenery.loaded.catch(e=>{document.getElementById("error").hidden=false;document.getElementById("errorText").textContent=e.message;});}
+ setWorld(parts){const g=this.g,data=bake(parts);g.bindBuffer(g.ARRAY_BUFFER,this.staticBuffer);g.bufferData(g.ARRAY_BUFFER,data,g.STATIC_DRAW);this.staticCount=data.length/9;}
+ resize(quality){const [w,h]=renderDimensions(innerWidth,innerHeight,quality);if(this.canvas.width!==w||this.canvas.height!==h){this.canvas.width=w;this.canvas.height=h;}this.half=Math.max(8.5,14/(innerWidth/innerHeight));}
+ begin(x,z){this.pickupGlow.begin();this.crowd.begin();this.target=[x,0,z];this.used=0;this.vp=mm(ortho(-this.half*innerWidth/innerHeight,this.half*innerWidth/innerHeight,-this.half,this.half,.1,110),lookAt([x,30,z+30],[x,0,z]));}
+ appendActor(mesh,x,y,z,yaw,shirt){if(!mesh.shirtBase||!this.crowd.add(mesh,x,y,z,yaw,shirt))this.append(mesh,x,y,z,yaw,1,shirt);}
+ append(mesh,x=0,y=0,z=0,yaw=0,fade=1,shirtVariant=0){if(this.used+mesh.length>this.dynamic.length){const next=new Float32Array(Math.max(this.dynamic.length*2,this.used+mesh.length));next.set(this.dynamic);this.dynamic=next;}const c=Math.cos(yaw),s=Math.sin(yaw),d=this.dynamic,tint=shirtVariant?shirtRGB[shirtVariant]:null,base=mesh.shirtBase;for(let i=0;i<mesh.length;i+=9){const k=this.used;d[k]=c*mesh[i]+s*mesh[i+2]+x;d[k+1]=mesh[i+1]+y;d[k+2]=-s*mesh[i]+c*mesh[i+2]+z;d[k+3]=c*mesh[i+3]+s*mesh[i+5];d[k+4]=mesh[i+4];d[k+5]=-s*mesh[i+3]+c*mesh[i+5];const shirt=tint&&base&&Math.abs(mesh[i+6]-base[0])<1e-6&&Math.abs(mesh[i+7]-base[1])<1e-6&&Math.abs(mesh[i+8]-base[2])<1e-6;d[k+6]=(shirt?tint[0]:mesh[i+6])*fade;d[k+7]=(shirt?tint[1]:mesh[i+7])*fade;d[k+8]=(shirt?tint[2]:mesh[i+8])*fade;this.used+=9;}}
+ draw(){const g=this.g;g.useProgram(this.program);g.viewport(0,0,this.canvas.width,this.canvas.height);g.clearColor(this.dark?0:.13,this.dark?0:.16,this.dark?0:.13,1);g.clear(g.COLOR_BUFFER_BIT|g.DEPTH_BUFFER_BIT);g.uniformMatrix4fv(this.vpLocation,false,this.vp);g.uniform1f(this.darkLocation,this.dark?1:0);g.uniform2fv(this.lampLocation,this.lamp);g.activeTexture(g.TEXTURE0);g.bindTexture(g.TEXTURE_2D,this.shadowTexture);g.uniform1i(this.shadowLocation,0);const bind=buffer=>{g.bindBuffer(g.ARRAY_BUFFER,buffer);this.attrs.forEach((a,i)=>g.vertexAttribPointer(a,3,g.FLOAT,false,36,i*12));};bind(this.staticBuffer);g.drawArrays(g.TRIANGLES,0,this.staticCount);bind(this.dynamicBuffer);g.bufferData(g.ARRAY_BUFFER,this.dynamic.subarray(0,this.used),g.DYNAMIC_DRAW);g.drawArrays(g.TRIANGLES,0,this.used/9);this.crowd.draw();this.scenery?.draw(this.vp,this.target,this.attrs);this.corpses.draw();this.pickupGlow.draw(this.vp,this.attrs);}
+ setFlashlight(x,z,walls,enabled){
+  this.dark=enabled;this.lamp=[x,z];if(!enabled)return;
+  for(let i=0;i<512;i++){const a=((i+.5)/512-.5)*Math.PI*2,dx=Math.cos(a),dz=Math.sin(a);let limit=12;
+   for(const o of walls){if(Math.abs(o.x-x)>o.w+12||Math.abs(o.z-z)>o.d+12)continue;let near=0,far=12;for(const [p,d,lo,hi] of [[x,dx,o.x-o.w,o.x+o.w],[z,dz,o.z-o.d,o.z+o.d]]){if(Math.abs(d)<.00001){if(p<lo||p>hi){far=-1;break;}}else{let a=(lo-p)/d,b=(hi-p)/d;if(a>b)[a,b]=[b,a];near=Math.max(near,a);far=Math.min(far,b);}}if(near<=far)limit=Math.min(limit,near);}
+   const k=i*4;this.shadowPixels[k]=Math.round(limit/16*255);this.shadowPixels[k+1]=this.shadowPixels[k+2]=0;this.shadowPixels[k+3]=255;
+  }
+  const g=this.g;g.bindTexture(g.TEXTURE_2D,this.shadowTexture);g.texSubImage2D(g.TEXTURE_2D,0,0,0,512,1,g.RGBA,g.UNSIGNED_BYTE,this.shadowPixels);
+ }
+ illuminated(x,z){if(!this.dark)return true;const dx=x-this.lamp[0],dz=z-this.lamp[1],d=Math.hypot(dx,dz),i=Math.min(511,Math.floor((Math.atan2(dz,dx)/(Math.PI*2)+.5)*512));return d<10.5&&d<this.shadowPixels[i*4]/255*16+.2;} screenGround(clientX,clientY,height=0){return [this.target[0]+(clientX/innerWidth*2-1)*this.half*innerWidth/innerHeight,this.target[2]+(clientY/innerHeight*2-1)*this.half*Math.SQRT2+height];}
+}
+
+
+
+
+
+
+
+
+
