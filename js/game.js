@@ -1,3 +1,4 @@
+import {showIntro} from './intro.js';
 import {newNeeds,needLevels,advanceNeeds,needPenalties,nightSpeed} from './survival.js';
 import {WEAPONS,meleeStats,createLoot,HEALTH_BOX,rollHealthDrop} from './weapons.js';
 import {SKILLS,freshProgress,loadProgress,saveProgress,skillRank,rankProgress,bonuses} from './progression.js';
@@ -211,7 +212,7 @@ function drawMap(){if(!mapContext)return;if(dungeonLevel>=0&&dungeonLevel<8){map
 $('playAgain').onclick=begin;
 refreshMap();function frame(t){const frameSeconds=(t-previous)/1000||0,dt=Math.min(frameSeconds,.04);previous=t;update(dt);draw();fpsFrames++;fpsClock+=frameSeconds;if(fpsClock>.6){$('perf').textContent=`${Math.round(fpsFrames/fpsClock)} FPS · ${zombies.length}/${config.maxAlive} HOSTILES`;fpsFrames=fpsClock=0;}requestAnimationFrame(frame);}
 
-$('start').onclick=()=>{$('menu').hidden=true;$('introMenu').hidden=false;};$('enterCemetery').onclick=begin;$('nextWave').onclick=startWave;$('pause').onclick=()=>setPaused(true);$('resume').onclick=()=>setPaused(false);$('restart').onclick=begin;$('restartPaused').onclick=begin;$('touchReload').onclick=reload;
+$('start').onclick=()=>{$('menu').hidden=true;showIntro(begin);};$('nextWave').onclick=startWave;$('pause').onclick=()=>setPaused(true);$('resume').onclick=()=>setPaused(false);$('restart').onclick=begin;$('restartPaused').onclick=begin;$('touchReload').onclick=reload;
 $('touchWeapon').onclick=switchWeapon;
 $('interact').onclick=interact;
 $('enterTower').onclick=()=>{if(!entryPrompt)return;entryPrompt=false;paused=false;$('towerPrompt').hidden=true;savedOutdoor={enemies:zombies,bodies:corpses};loadFloor(0);};
