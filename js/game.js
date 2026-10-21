@@ -1,4 +1,4 @@
-import {showIntro} from './intro.js';
+import {showIntro} from './intro.js?v=single-2';
 import {newNeeds,needLevels,advanceNeeds,needPenalties,nightSpeed} from './survival.js';
 import {WEAPONS,meleeStats,createLoot,HEALTH_BOX,rollHealthDrop} from './weapons.js';
 import {SKILLS,freshProgress,loadProgress,saveProgress,skillRank,rankProgress,bonuses} from './progression.js';
