@@ -96,3 +96,9 @@ Daily needs and night movement
 Optional HUD
 - First-screen HUD toggle defaults to OFF. Hides meters, counters, minimap, objectives, announcements, reticle and footer diagnostics. Pause, touch controls, pickup prompts and manual next-wave controls remain available. Choice lasts for the page session.
 - No automatic wave-three/four reveal or companion/story systems implemented. No tests run, per user preference.
+
+Quick/heavy melee and committed enemy attacks
+- Left click keeps quick swings. Hold/release right click or Space (HEAVY on touch) charges an overhead heavy attack over 0.65 seconds: up to +75% damage, 50% greater stamina cost, 45% longer duration and a narrower arc. Brief taps use quick attacks. Charging slows movement and prevents sprinting. Knife heavy attacks still do not stagger.
+- Bat target limit by melee rank: ranks 0–2 hit 1; 3–4 hit 2; 5–6 hit 3; 7–8 hit 4; 9–10 hit 5. Both attack types obey that cap.
+- Normal/crawler attacks lock their heading at wind-up, then burst forward for 0.18 seconds and swipe once in a forward cone. The attack cannot turn to track a sidestep. Wind-up and recovery give counterattack opportunities; bat stagger interrupts, knife damage does not. Movement uses existing collision checks and the night speed multiplier.
+- No tests or preview run, per the ongoing user preference.

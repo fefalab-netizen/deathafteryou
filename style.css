@@ -34,3 +34,4 @@ body.hud-off #hud{visibility:hidden}
 body.hud-off #pause{visibility:visible}
 body.hud-off #objective,body.hud-off #map,body.hud-off #announcement,body.hud-off #crosshair,body.hud-off #bossHud,body.hud-off footer{display:none!important}
 #hudToggle{font-size:11px;margin:10px 0;color:#d1b97c}
+#touchHeavy{touch-action:none;position:absolute;right:160px;bottom:90px;font-size:10px}

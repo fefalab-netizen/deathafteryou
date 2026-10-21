@@ -18,8 +18,8 @@
   </header>
   <div id="objective">SOUTH APPROACH · EXPLORE THE DISTRICT</div><canvas id="map" width="180" height="180" aria-label="Cemetery map: memorial, chapel, south gate and approaching enemies"></canvas><div id="announcement" aria-live="polite"></div>
   <div id="crosshair"><i></i></div>
-  <footer><span id="status">PERIMETER QUIET</span><span id="cycleStatus">DAY · NO FLASHLIGHT</span><span id="needsStatus" aria-live="polite"></span><span id="perf">— FPS</span><span class="desktop-hint">WASD move · Mouse aim · Hold click to swing · Shift run · Esc pause</span></footer>
-  <div id="touchControls"><div id="moveStick" class="stick"><span>MOVE</span><i></i></div><div id="aimStick" class="stick"><span>AIM / ATTACK</span><i></i></div><button id="touchReload">RELOAD</button><button id="touchWeapon">TO BAT</button><button id="touchSprint">RUN</button></div>
+  <footer><span id="status">PERIMETER QUIET</span><span id="cycleStatus">DAY · NO FLASHLIGHT</span><span id="needsStatus" aria-live="polite"></span><span id="perf">— FPS</span><span class="desktop-hint">WASD move · Mouse aim · Hold left click for quick swings · Hold/release right click or Space for heavy · Shift run · Esc pause</span></footer>
+  <div id="touchControls"><div id="moveStick" class="stick"><span>MOVE</span><i></i></div><div id="aimStick" class="stick"><span>AIM / ATTACK</span><i></i></div><button id="touchReload">RELOAD</button><button id="touchWeapon">TO BAT</button><button id="touchHeavy">HOLD: HEAVY</button><button id="touchSprint">RUN</button></div>
   <button id="nextWave" class="primary floating" hidden>START WAVE 01 →</button>
   <button id="interact" class="primary floating" hidden>INTERACT [E]</button>
   <div id="bossHud" hidden><span>THE WRECKER</span><progress id="bossHealth" max="65" value="65"></progress></div>
@@ -31,7 +31,7 @@
     <label class="toggle"><input id="endless" type="checkbox" checked> Automatic follow-up waves <small>12 seconds to regroup · stamina restored · no healing</small></label>
     <button id="hudToggle" aria-pressed="false">HUD: OFF</button><button id="developerMode">DEVELOPER MODE: OFF</button><button id="start" class="primary">OPEN THE GATES <span>→</span></button>
     <p class="controls desktop-hint">WASD / arrows move · Mouse aims · Hold click to swing<br>Shift runs · Q switches weapons · E picks up · R reloads<br>P opens stats · Esc pauses · Watch your stamina<br>Wide paths offer escape. Grave rows offer cover.</p>
-    <p class="controls mobile-hint">Left stick to move · Right stick to aim and attack<br>RUN toggles sprint · Release attack to recover stamina</p>
+    <p class="controls mobile-hint">Left stick to move · Right stick to aim and attack · Hold/release HEAVY for a charged strike<br>RUN toggles sprint · Release attack to recover stamina</p>
     <span class="build">BLACKTHORN CEMETERY · CHAPTER ONE · LOCAL PLAYTEST</span>
   </div></section>
   <section id="introMenu" class="overlay story-overlay" hidden><div class="panel story-panel">
