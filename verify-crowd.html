@@ -1,0 +1,25 @@
+<!doctype html><meta charset="utf-8"><title>Crowd renderer verification</title>
+<style>body{margin:0;overflow:hidden;background:#222;color:white;font:16px sans-serif}canvas{width:100vw;height:100vh}#status{position:absolute;top:12px;left:12px;background:#222;padding:12px}</style>
+<canvas id="scene"></canvas><div id="status">Checking 120 animated zombies…</div>
+<script type="module">
+import {WorldRenderer,characterMesh,block} from './js/render.js';
+const r=new WorldRenderer(document.querySelector('canvas')),status=document.querySelector('#status');
+r.setWorld([block(0,-.1,0,50,.2,50,'#59633d')]);
+let frames=0,start=performance.now();
+function frame(now){
+ try{
+ r.resize(.5);r.begin(0,0);const time=(now-start)/1000;
+ for(let i=0;i<120;i++){
+  const phase=time+(i%4)*.2,kind=i%3===0?'crawler':'normal';
+  r.appendActor(characterMesh(kind,'walk',phase,true,0,phase,'bat'),(i%15-7)*1.55,0,(Math.floor(i/15)-3.5)*2,Math.sin(time*.4+i)*.7,i%5);
+ }
+ r.draw();if(r.g.getError()!==r.g.NO_ERROR)throw Error('WebGL error');
+ if(r.crowd.ext&&r.used!==0)throw Error('Crowd unexpectedly copied vertices on CPU');
+ if(r.crowd.ext&&r.crowd.groups.size>8)throw Error('Pose grouping failed');
+ frames++;
+ status.textContent=`${r.crowd.ext?'PASS: GPU instancing':'PASS: compatibility fallback'} · 120 animated zombies · ${r.crowd.groups.size} pose groups · ${Math.round(frames*1000/(now-start||1))} average FPS · no WebGL errors`;
+ if(frames<240)requestAnimationFrame(frame);
+ }catch(e){status.textContent='FAIL: '+e.stack;console.error(e);}
+}
+requestAnimationFrame(frame);
+</script>

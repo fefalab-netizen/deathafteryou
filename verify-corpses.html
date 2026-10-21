@@ -1,0 +1,27 @@
+<!doctype html><meta charset="utf-8"><title>Corpse renderer verification</title>
+<style>body{margin:0;background:#222;color:white;font:16px sans-serif}canvas{width:100vw;height:100vh}#status{position:absolute;top:12px;left:12px;background:#222;padding:12px}</style>
+<canvas id="scene"></canvas><div id="status">Checking corpse captures…</div>
+<script type="module">
+import {WorldRenderer,characterMesh,DEATH_SETTLE_TIME,block} from './js/render.js';
+const status=document.querySelector('#status'),r=new WorldRenderer(document.querySelector('canvas'));
+r.setWorld([block(0,-.1,0,35,.2,35,'#59633d')]);
+const bodies=Array.from({length:10},(_,i)=>({x:(i%5-2)*3,z:i<5?-2:3,yaw:i*.63,kind:i<5?'normal':'crawler',shirtVariant:i%5}));
+let frames=0,captures=0;
+function frame(){
+ try{
+ r.resize(.5);r.begin(0,0);r.corpses.sync(bodies);
+ for(const c of bodies)r.corpses.add(c,()=>{captures++;return characterMesh(c.kind,'dead',DEATH_SETTLE_TIME,false,0,0,'bat');});
+ // Live models behind their sprite counterparts for visual comparison.
+ for(const c of bodies)r.append(characterMesh(c.kind,'dead',DEATH_SETTLE_TIME,false,0,0,'bat'),c.x,0,c.z-2,c.yaw,1,c.shirtVariant);
+ r.draw();if(r.g.getError()!==r.g.NO_ERROR)throw Error('WebGL error');
+ if(++frames<15){requestAnimationFrame(frame);return;}
+ if(captures!==10||r.corpses.entries.size!==10)throw Error('Sprite caching failed');
+ status.textContent='PASS: 10 cached sprites, all shirt colors, normal/crawler, rotated poses; no WebGL errors. Models above, sprites below.';
+ const entries=[...r.corpses.entries.values()];
+ r.corpses.sync([]);
+ if(r.corpses.entries.size||entries.some(e=>r.g.isTexture(e.texture)||r.g.isBuffer(e.buffer)))throw Error('Corpse resources leaked');
+ status.textContent+=' Cleanup passed.';
+ }catch(e){status.textContent='FAIL: '+e.stack;console.error(e);}
+}
+requestAnimationFrame(frame);
+</script>

@@ -1,0 +1,9 @@
+<!doctype html><meta charset="utf-8"><title>Pickup glow verification</title><style>body{margin:0;background:#17201b;color:#ddd}canvas{width:100vw;height:100vh}p{position:absolute;top:10px;left:16px;background:#17201b;padding:12px}</style><canvas id="scene"></canvas><p id="status">Checking pickups…</p><script type="module">
+import {WorldRenderer,bake,block} from './js/render.js';import {world,scenery} from './js/world.js';
+const r=new WorldRenderer(document.querySelector('canvas'));r.setWorld(world);r.setScenery(scenery);await r.scenery.loaded;
+const knife=bake([block(0,.12,0,.1,.08,.32,'#c0c4af'),block(0,.1,.24,.12,.1,.2,'#644b36')]);
+const health=bake([block(0,.19,0,.48,.30,.36,'#c4cdb6'),block(0,.35,0,.28,.02,.075,'#557962'),block(0,.35,0,.075,.02,.25,'#557962')]);
+r.resize(.5);r.begin(-10,-62);r.pickupGlow.add(-12,-62,false,0);r.pickupGlow.add(-8,-61,true,0);r.append(knife,-12,0,-62);r.append(health,-8,0,-61);r.draw();
+if(r.g.getError()!==r.g.NO_ERROR)throw Error('WebGL error');if(r.g.isEnabled(r.g.BLEND)||!r.g.getParameter(r.g.DEPTH_WRITEMASK))throw Error('Glow leaked render state');
+document.querySelector('#status').textContent='PASS · weapon and health halos · darker scenery · no WebGL errors · blend/depth state restored';
+</script>
