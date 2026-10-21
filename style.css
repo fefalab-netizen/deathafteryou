@@ -52,3 +52,14 @@ body.hud-off #objective,body.hud-off #map,body.hud-off #announcement,body.hud-of
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 @media(max-width:600px){#introMenu{padding:30px 24px}#introMenu:before{background:rgba(9,10,8,.72)}#introMenu .story-copy{min-height:290px}}
 @media(max-height:540px){#introMenu{padding:20px 30px}#introMenu .story-panel{width:min(570px,100%)}#introMenu h2{font-size:26px;margin:8px 0 12px}#introMenu .story-copy{min-height:175px}#introMenu #introTyped{font-size:14px;line-height:1.5}#introMenu .story-actions{margin-top:10px}#introMenu small{margin-top:10px}}
+/* Show the photograph first, then the original single-page introduction. */
+#introMenu{display:block;padding:clamp(24px,4vw,60px);background-attachment:fixed}
+#introMenu:before{position:fixed;animation:intro-shade 2.7s both}
+#introMenu .story-panel{width:min(650px,100%);margin:auto 0;animation:intro-words 2.7s both}
+#introMenu .story-panel p{font:clamp(14px,1.15vw,17px)/1.65 'Courier New',Courier,monospace;color:#eee5d0;margin:16px 0}
+#introMenu .story-panel h2{margin:14px 0 24px}
+#introMenu .story-panel blockquote{font:italic 17px/1.6 'Courier New',Courier,monospace;border-left:2px solid #c6bea977;color:#e3d4b1;margin:22px 0;padding:4px 18px}
+#introMenu .story-panel small{font-size:11px;letter-spacing:0;line-height:1.6}
+@keyframes intro-words{0%,74%{opacity:0;visibility:hidden}100%{opacity:1;visibility:visible}}
+@keyframes intro-shade{0%,74%{opacity:0}100%{opacity:1}}
+@media(prefers-reduced-motion:reduce){#introMenu .story-panel,#introMenu:before{animation-timing-function:steps(1,end)}}
