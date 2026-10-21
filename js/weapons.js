@@ -18,7 +18,7 @@ export const WEAPONS={
  carbine:gun('Patrol carbine',4,.2,20,2.2,38,.025),
  rifle:gun('Hunting rifle',8,1.15,5,2.8,50,.008)
 };
-export function meleeStats(id,rank=0){const w=WEAPONS[id];return {...w,duration:w.duration*(1-.015*rank),impact:w.impact*(1-.015*rank),cost:Math.max(4,w.cost-rank)};}
+export function meleeStats(id,rank=0){const w=WEAPONS[id];return {...w,maxHits:id==='bat'?Math.max(1,Math.floor((rank+1)/2)):w.maxHits,duration:w.duration*(1-.015*rank),impact:w.impact*(1-.015*rank),cost:Math.max(4,w.cost-rank)};}
 // Two single-use search sites, each with only an 8% chance of a weapon.
 // No weapon drops, rerolls or regenerating ammunition.
 export function createLoot(random=Math.random){

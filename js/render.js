@@ -50,7 +50,7 @@ export const DEATH_SETTLE_TIME=(clips.get('hit').frames.length-1)/clips.get('hit
 export const MUZZLE=[.21,1.19,.87];
 export function muzzlePosition(a){const clock=a.moving?a.animation:(a.idleAnimation||0),m=characterMesh('human','shoot',0,a.moving,a.moveYaw||0,clock,a.weapon||'pistol').muzzle||MUZZLE,c=Math.cos(a.yaw),s=Math.sin(a.yaw);return [a.x+c*m[0]+s*m[2],m[1],a.z-s*m[0]+c*m[2]];}
 // 24 Hz interpolated source poses. Geometry stays shared across actors of the same type.
-export function characterMesh(kind,state,time,moving,moveYaw=0,locomotionTime=time,weapon='pistol',shirtVariant=0){
+export function characterMesh(kind,state,time,moving,moveYaw=0,locomotionTime=time,weapon='pistol',shirtVariant=0,attackStyle='quick'){
  const zombie=kind!=='human',melee=WEAPONS[weapon]?.type==='melee',type=TYPES[kind]||TYPES.normal;
  const id=state==='dead'||state==='hit'?'hit':zombie?(kind==='runner'?'zombie-feral':'zombie'):moving?'walk':'idle';
  const clip=clips.get(id),oneShot=state==='dead'||state==='hit',duration=(clip.frames.length-1)/clip.fps;
@@ -59,8 +59,8 @@ export function characterMesh(kind,state,time,moving,moveYaw=0,locomotionTime=ti
  const tick=Math.floor((oneShot?Math.min(time,duration):baseTime%(directionalWalk?1:clip.frames.length/clip.fps))*24);
  const phase=oneShot&&time>=duration?duration:tick/24,frame=phase*clip.fps,f=Math.min(Math.floor(frame),clip.frames.length-1),next=oneShot?Math.min(f+1,clip.frames.length-1):(f+1)%clip.frames.length;
  const direction=directionalWalk?((Math.round(moveYaw/(Math.PI/8))%16)+16)%16:0;
- const action=state==='swing'?Math.min(23,Math.floor(time/BAT.duration*24)):state==='attack'?Math.min(15,Math.floor(time*16)):state==='shoot'?Math.min(5,Math.floor(time*30)):state==='reload'?Math.min(23,Math.floor(time*18)):0;
- const key=[kind,weapon,state,id,moving,tick,direction,action,oneShot&&time>=duration].join(':');if(cache.has(key)){const mesh=cache.get(key);cache.delete(key);cache.set(key,mesh);return mesh;}
+ const action=state==='charge'?Math.min(23,Math.floor(time/.65*23)):state==='swing'?Math.min(23,Math.floor(time/BAT.duration*24)):state==='attack'?Math.min(15,Math.floor(time*16)):state==='shoot'?Math.min(5,Math.floor(time*30)):state==='reload'?Math.min(23,Math.floor(time*18)):0;
+ const key=[kind,weapon,attackStyle,state,id,moving,tick,direction,action,oneShot&&time>=duration].join(':');if(cache.has(key)){const mesh=cache.get(key);cache.delete(key);cache.set(key,mesh);return mesh;}
  let p=directionalWalk?gait('walk',phase):interpolate(clip.frames[f],clip.frames[next],frame-f);
  if(directionalWalk){
   // Move the foot targets relative to fixed hips. The pelvis and feet keep the
@@ -76,7 +76,7 @@ export function characterMesh(kind,state,time,moving,moveYaw=0,locomotionTime=ti
   p.angles.upperArmR[0]-=recoil;p.angles.forearmR[0]-=recoil;
   if(state==='reload'){const reach=Math.sin(action/23*Math.PI);p.angles.upperArmR[0]+=38*reach;p.angles.forearmR[0]-=57*reach;p.angles.upperArmL[0]+=25*reach;p.angles.forearmL[0]-=15*reach;p.angles.head=[15*reach,0,0];}
   if(melee){
-   const swing=clips.get('sweep-club'),pos=state==='swing'?action/23*(swing.frames.length-1):0,i=Math.floor(pos),q=interpolate(swing.frames[i],swing.frames[Math.min(i+1,swing.frames.length-1)],pos-i);
+   const swing=clips.get(attackStyle==='heavy'||state==='charge'?'chop-club':'sweep-club'),pos=state==='charge'?action/23*(swing.frames.length-1)*.35:state==='swing'?action/23*(swing.frames.length-1):0,i=Math.floor(pos),q=interpolate(swing.frames[i],swing.frames[Math.min(i+1,swing.frames.length-1)],pos-i);
    for(const j of ['torso','head','upperArmL','upperArmR','forearmL','forearmR','handL','handR'])p.angles[j]=q.angles[j];if(weapon==='knife'){const thrust=state==='swing'?Math.sin(action/23*Math.PI):0;p.angles.upperArmR=[-45-55*thrust,-8,0];p.angles.forearmR=[-70+65*thrust,0,0];p.angles.upperArmL=[-15,0,0];p.angles.forearmL=[-25,0,0];}
   }
  }
@@ -97,7 +97,7 @@ export function characterMesh(kind,state,time,moving,moveYaw=0,locomotionTime=ti
  }
  if(kind==='crawler'&&(state==='hit'||state==='dead')){p.root[1]=.29;p.angles.torso=[72,0,0];p.angles.head=[-45,0,0];p.feet={};for(const side of ['L','R']){p.angles['thigh'+side]=[-60,0,0];p.angles['shin'+side]=[110,0,0];}}
  if(!zombie&&weapon==='bat'){
-  if(state!=='swing'&&state!=='dead'&&state!=='hit'){p.angles.torso=[2,0,0];p.angles.upperArmR=[-53.5,-4.5,0];p.angles.forearmR=[-120.5,10,7.5];p.angles.handR=[-65,35,-2.5];}
+  if(state!=='swing'&&state!=='charge'&&state!=='dead'&&state!=='hit'){p.angles.torso=[2,0,0];p.angles.upperArmR=[-53.5,-4.5,0];p.angles.forearmR=[-120.5,10,7.5];p.angles.handR=[-65,35,-2.5];}
   p.weapon='club';p.weaponHand='R';p.support=true;p.supportPasses=32;
  }
  const rig=rigPose(p),parts=[];let muzzle=null;

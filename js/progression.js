@@ -1,5 +1,5 @@
 export const SKILLS={
- melee:{name:'Melee',unit:'swings',base:50,stat:'swings',benefit:'1 less stamina per rank; 1.5% faster attacks'},
+ melee:{name:'Melee',unit:'swings',base:50,stat:'swings',benefit:'1 less stamina per rank; 1.5% faster attacks; bat targets: 1 at rank 1, 2 at 3, 3 at 5, up to 5'},
  shooting:{name:'Shooting',unit:'shots fired',base:25,stat:'shots',benefit:'2% faster reloads per rank'},
  running:{name:'Running',unit:'metres sprinted',base:250,stat:'sprintMetres',benefit:'1% faster sprint per rank'},
  stamina:{name:'Endurance',unit:'stamina spent',base:500,stat:'staminaSpent',benefit:'+2 maximum stamina per rank'},
