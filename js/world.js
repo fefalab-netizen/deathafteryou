@@ -92,6 +92,11 @@ for(const [cx,cz] of [[-35,10],[34,12],[-34,-12],[34,-12],[-51,10],[52,11],[-52,
  if(surfaceAt(x,z)!=='grass')continue;prop(pick(['grass-tuft','wildflowers','bush']),x,z,.6+rand(),.45+rand()*.65);}
 }
 for(let i=0;i<65;i++){const x=rand()*146-73,z=rand()*146-73;if(surfaceAt(x,z)!=='grass')continue;prop('grass-tuft',x,z,.35+rand()*.4,.25);}
+// Only exit: mortuary facade against the northern perimeter, with a clear approach.
+floor('paving',0,-71,8,8,.06);
+solid(-5,-73,1,8,3.5,'#666653');solid(5,-73,1,8,3.5,'#666653');
+solid(0,-77,11,.6,3.5,'#666653');
+prop('mausoleum',0,-72,10,8);prop('lantern',-3.7,-69,1.2,1.6);prop('lantern',3.7,-69,1.2,1.6);
 export const outdoorObstacles=obstacles.map(o=>({...o}));
 let activeLimit=bounds;
 export function setCollisionScene(list,limit=bounds){obstacles.splice(0,obstacles.length,...list.map(o=>({...o})));activeLimit=limit;lastCell=-1;for(let z=0;z<N;z++)for(let x=0;x<N;x++)occupied[z*N+x]=blocked(x-bounds,z-bounds,.48)?1:0;}export function blocked(x,z,r=.4){return Math.abs(x)>activeLimit-r||Math.abs(z)>activeLimit-r||obstacles.some(o=>Math.abs(x-o.x)<o.w+r&&Math.abs(z-o.z)<o.d+r);}

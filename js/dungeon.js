@@ -1,6 +1,7 @@
+import {MORTUARY_PLANS} from './mortuary-plan.js?v=1';
 import {block} from './render.js';
 
-export const TOWER={x:-64,z:-56};
+export const TOWER={x:0,z:-70};
 export const WRECKER_HOME={x:-59,z:52};
 export const FLOOR_NAMES=['Foyer & reception','Garden apartments','Family apartments','Offices','Blocked residential wing','Services & residences','Damaged upper apartments','Penthouse residences'];
 // Each floor has a south entrance and north exit, with rooms linked through real door openings.
@@ -83,4 +84,19 @@ function residentialFloor(index){
  }
  for(const z of [-29,29])for(let i=0;i<5;i++)add(0,.05+i*.06,z+1-i*.4,2.7,.1+i*.12,.42,'#b8ae91');
  return {parts,obstacles,walls,rooms,spawns,start:{x:0,z:29},exit:{x:0,z:-29},limit:33,name:FLOOR_NAMES[index]};
+}
+
+// Geometry also drives the floor-plan artifacts.
+export function makePassage(level=0,state={}){
+ const plan=MORTUARY_PLANS[level],parts=[],obstacles=[],walls=[];
+ const solid=(o,h,color,isWall=false)=>{const box={x:o.x,z:o.z,w:o.w/2,d:o.d/2};obstacles.push(box);if(isWall)walls.push(box);parts.push(block(o.x,h/2,o.z,o.w,h,o.d,color));};
+ parts.push(block(0,-.1,0,36,.2,48,'#827b66'));
+ for(const o of plan.walls)solid(o,1.3,'#a29b84',true);
+ for(const o of plan.furniture)solid(o,.7,'#675c49');
+ for(const o of plan.barriers){if(o.id!=='collapse'&&state[o.id])continue;solid(o,o.id==='shelf'?1.5:1.1,o.color,true);}
+ if(level===0&&state.shelf)solid({x:-15,z:-8,w:3.2,d:.9},1.5,'#826e50');
+ for(let i=0;i<6;i++)parts.push(block(12,.07+i*.09,20-i*.5,2.8,.14+i*.18,.5,'#b5aa8a'));
+ if(level===0){parts.push(block(-12,.82,17,.6,.025,.45,'#ded3af'));if(!state.key)parts.push(block(-12,.1,-17,.45,.08,.12,'#d3b65f'));}
+ else{parts.push(block(12,1.1,-23.7,3,.8,.05,'#94afaa'));parts.push(block(12,.02,-22,3,.03,1.5,'#b8a578'));}
+ return {parts,obstacles,walls,spawns:plan.spawns,rooms:plan.rooms.map(([name,x,z])=>({name,x,z})),start:plan.start,exit:plan.exit,name:plan.name,limit:25};
 }

@@ -3,7 +3,7 @@ import {WEAPONS} from './weapons.js';
 import {CrowdRenderer} from './crowd.js';
 import {CorpseSprites} from './corpses.js';
 import {SceneryRenderer} from './scenery.js';
-import {TYPES,SHIRT_COLORS} from './zombies.js';
+import {TYPES,SHIRT_COLORS} from './zombies.js?v=undertaker-1';
 import {BAT} from './combat.js';
 import {V,I,mm,transform,translate,scaled,rotX,rotY,ortho,lookAt,rigPose,armFrame,project,exampleLibrary,clone,interpolate,gait} from './spriteforge.js';
 
