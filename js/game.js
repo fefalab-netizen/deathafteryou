@@ -2,7 +2,7 @@ import {MORTUARY_PLANS} from './mortuary-plan.js?v=1';
 import {showCompanion,closeCompanion} from './companion.js?v=2';
 import {showIntro} from './intro.js?v=typing-3';
 import {newNeeds,needLevels,advanceNeeds,needPenalties,nightSpeed} from './survival.js';
-import {WEAPONS,meleeStats,createLoot,HEALTH_BOX,rollHealthDrop} from './weapons.js';
+import {WEAPONS,meleeStats,createLoot,HEALTH_BOX,rollHealthDrop} from './weapons.js?v=low-health-1';
 import {SKILLS,freshProgress,loadProgress,saveProgress,skillRank,rankProgress,bonuses} from './progression.js';
 import {TOWER,WRECKER_HOME,makeFloor,makeRoof,makePassage} from './dungeon.js?v=puzzle-2';
 import {BAT,STAMINA} from './combat.js';
@@ -21,7 +21,7 @@ const needs=newNeeds();
 const limits=()=>bonuses(progress),equipped=()=>WEAPONS[player.weapon];
 function persist(){saveOK=saveProgress(storage,progress);}
 function track(stat,amount=1){const before=Object.entries(SKILLS).filter(([,s])=>s.stat===stat).map(([id])=>[id,skillRank(progress,id)]);progress.stats[stat]+=amount;progress.runStats[stat]+=amount;for(const [id,rank] of before)if(skillRank(progress,id)>rank){announce(SKILLS[id].name.toUpperCase()+' · RANK '+skillRank(progress,id));persist();}}
-let mobileSprint=false;
+let mobileSprint=false,developerInvulnerable=false;
 let companionSeen=false,companionActive=false,hudMode='story',hudStage=0;
 let mortuaryState={},jumpPrompt=false;
 let bossSpawned=false,hasExitKey=false,thoughtUntil=0,thoughtCooldown=0,wallThought=false;
@@ -45,7 +45,7 @@ function announce(text){$('announcement').textContent=text;announcementTime=3;$(
 function clearInput(){player.charge=-1;keys.clear();mouse.down=false;mobileSprint=false;for(const [name,s] of Object.entries(sticks)){s.x=s.y=0;s.id=null;$(name==='move'?'moveStick':'aimStick').querySelector('i').style.transform='';}}
 function isPortrait(){return matchMedia('(pointer:coarse) and (orientation:portrait)').matches;}
 function setPaused(value){if(!started||dead||entryPrompt||companionActive||jumpPrompt)return;paused=value;clearInput();$('pauseMenu').hidden=!value;$('crosshair').style.display='none';}
-function begin(){mortuaryState={};jumpPrompt=false;$('jumpPrompt').hidden=true;closeCompanion();companionSeen=companionActive=false;hudStage=0;bossSpawned=hasExitKey=wallThought=false;thoughtUntil=thoughtCooldown=0;applyHud();Object.assign(needs,newNeeds());progress.runStats=freshProgress().stats;player.flashlight=false;lightStamp=-1;loot=createLoot();loot.push({id:'flashlight',x:24,z:27});inventory=['bat'];weaponAmmo={};track('runs');$('introMenu').hidden=true;$('journal').hidden=true;quality=+$('quality').value;roster=[];zombies=[];corpses=[];tracers=[];wave=kills=pending=0;between=spawnTimer=elapsed=deathTime=0;Object.assign(player,{x:START.x,z:START.z,yaw:Math.PI,health:100,ammo:12,reload:0,shot:0,hurt:0,animation:0,idleAnimation:0,moving:false,moveYaw:0,slow:0,vx:0,vz:0,weapon:'bat',stamina:100,regenDelay:0,exhausted:false,swing:-1,swingHit:false,swingYaw:0});player.health=limits().health;player.stamina=limits().stamina;cameraX=START.x;cameraZ=START.z;arenaTriggered=false;won=false;dead=paused=false;$('victoryMenu').hidden=true;running=started=true;clearInput();for(const id of ['menu','pauseMenu','deathMenu'])$(id).hidden=true;$('nextWave').hidden=true;initializeEncounters();announce('BELL ONE · THE DEAD ARE WAKING');sound('ready');}
+function begin(){mortuaryState={};jumpPrompt=false;$('jumpPrompt').hidden=true;closeCompanion();companionSeen=companionActive=false;hudStage=0;bossSpawned=hasExitKey=wallThought=false;thoughtUntil=thoughtCooldown=0;applyHud();Object.assign(needs,newNeeds());progress.runStats=freshProgress().stats;player.flashlight=false;lightStamp=-1;loot=createLoot();loot.push({id:'flashlight',x:24,z:27});inventory=['bat'];weaponAmmo={};track('runs');$('introMenu').hidden=true;$('journal').hidden=true;quality=+$('quality').value;roster=[];zombies=[];corpses=[];tracers=[];wave=kills=pending=0;between=spawnTimer=elapsed=deathTime=0;Object.assign(player,{x:START.x,z:START.z,yaw:Math.PI,health:100,ammo:12,reload:0,shot:0,hurt:0,animation:0,idleAnimation:0,moving:false,moveYaw:0,slow:0,vx:0,vz:0,weapon:'bat',stamina:100,regenDelay:0,exhausted:false,swing:-1,swingHit:false,swingYaw:0});player.health=limits().health;player.stamina=limits().stamina;cameraX=START.x;cameraZ=START.z;arenaTriggered=false;won=false;dead=paused=false;$('victoryMenu').hidden=true;running=started=true;clearInput();for(const id of ['menu','pauseMenu','deathMenu'])$(id).hidden=true;$('nextWave').hidden=true;initializeEncounters();placeStarterPistol();announce('BELL ONE · THE DEAD ARE WAKING');sound('ready');}
 function startWave(){if(!running||dead||paused||won||wave>=WAVES.length||pending||arenaEnemies())return;wave++;progress.stats.bestWave=Math.max(progress.stats.bestWave,wave);pending=WAVES[wave-1];roster=waveRoster(wave,pending);spawnTimer=2.5;between=0;$('nextWave').hidden=true;announce(`WAVE ${wave} / ${WAVES.length} · ${pending} RISING`);}
 function spawn(){const kind=roster[roster.length-1]||'normal',type=TYPES[kind];for(let tries=0;tries<40;tries++){const angle=Math.random()*Math.PI*2,radius=18+Math.random()*9;let x=clamp(player.x+Math.sin(angle)*radius,-75,75),z=clamp(player.z+Math.cos(angle)*radius,-75,75);if(blocked(x,z,type.radius)||Math.hypot(player.x-x,player.z-z)<7||zombies.some(a=>Math.hypot(a.x-x,a.z-z)<type.radius+TYPES[a.kind].radius+.1))continue;zombies.push({kind,shirtVariant:rollShirt(),encounter:'arena',x,z,yaw:0,health:type.hp,speed:type.speed*(.95+Math.random()*.1)+Math.min((wave-1)*.018,.16),animation:Math.random()*3,hurt:0,attack:0,cooldown:Math.random()*.5,struck:false,flank:Math.random()>.5?1:-1,burst:0,burstCooldown:.6+Math.random()*1.2,windup:0,chargeX:0,chargeZ:0});roster.pop();return true;}return false;}function reload(){const w=equipped(),ammo=weaponAmmo[player.weapon];if(!running||dead||paused||w.type!=='gun'||player.reload>0||player.ammo===w.magazine||!ammo?.reserve)return;player.reload=w.reload*limits().reload;sound('ready');}
 function fire(){if(equipped().type==='melee'){startSwing();return;}if(player.reload>0||player.shot>0)return;if(player.ammo===0){reload();return;}const w=equipped();player.ammo--;player.shot=w.interval;track('shots');sound('shot');for(let i=0;i<w.pellets;i++)shootRay(w,player.yaw+(Math.random()-.5)*w.spread*2);}
@@ -58,7 +58,7 @@ function shootRay(w,yaw){
  tracers.push({x:origin[0],y:origin[1],z:origin[2],dx,dz,length:range,endY:target?.kind==='crawler'?.4:1.12,life:.085});
  if(target){track('hits');target.health-=w.damage;target.hurt=TYPES[target.kind].stagger;target.hitDuration=target.hurt;if(target.health<=0)killEnemy(target);sound('hit');}
 }
-function killEnemy(target){if(!zombies.includes(target))return;if(rollHealthDrop())loot.push({id:'health',x:target.x,z:target.z});if(target.kind==='wrecker'){bossDefeated=true;loot.push({id:'exit-key',x:target.x,z:target.z});think('A key. Finally, a useful employee.',true);}kills++;track('kills');corpses.push({...target,age:0});zombies=zombies.filter(z=>z!==target);if(corpses.length>24)corpses.shift();}
+function killEnemy(target){if(!zombies.includes(target))return;if(rollHealthDrop(Math.random(),player.health))loot.push({id:'health',x:target.x,z:target.z});if(target.kind==='wrecker'){bossDefeated=true;loot.push({id:'exit-key',x:target.x,z:target.z});think('A key. Finally, a useful employee.',true);}kills++;track('kills');corpses.push({...target,age:0});zombies=zombies.filter(z=>z!==target);if(corpses.length>24)corpses.shift();}
 function switchWeapon(){if(!running||dead||paused||player.swing>=0||player.charge>=0||player.reload>0)return;if(equipped().type==='gun')weaponAmmo[player.weapon].loaded=player.ammo;player.weapon=inventory[(inventory.indexOf(player.weapon)+1)%inventory.length];player.ammo=weaponAmmo[player.weapon]?.loaded||0;player.shot=0;announce(WEAPONS[player.weapon].name.toUpperCase());}
 function startCharge(){if(!running||paused||dead||player.swing>=0||player.charge>=0||equipped().type!=='melee'||player.exhausted)return;player.charge=0;mouse.down=false;}
 function releaseCharge(){if(!(player.charge>=0))return;const amount=Math.min(1,player.charge/.65);player.charge=-1;if(running&&!paused&&!dead)startSwing(amount>=.3?amount:0);}
@@ -87,7 +87,7 @@ function updateWrecker(z,dt,distance){
  const homeDistance=0;
  if(homeDistance>19){z.attack=z.burst=z.windup=0;const dx=WRECKER_HOME.x-z.x,dz=WRECKER_HOME.z-z.z,l=Math.hypot(dx,dz);if(l>.3){move(z,dx/l*z.speed*dt,dz/l*z.speed*dt,TYPES.wrecker.radius);z.yaw=Math.atan2(dx,dz);z.animation+=dt;}return true;}
  if(z.burst>0){z.burst-=dt;z.yaw=Math.atan2(z.chargeX,z.chargeZ);const x=z.x,zz=z.z;move(z,z.chargeX*7.5*dt,z.chargeZ*7.5*dt,TYPES.wrecker.radius);z.animation+=dt*2;
-  if(distance<1.4){damage(z);player.slow=1;z.burst=0;z.cooldown=1;}
+  if(distance<1.4){damage(z);if(!developerInvulnerable)player.slow=1;z.burst=0;z.cooldown=1;}
   if(Math.hypot(z.x-x,z.z-zz)<.01){z.burst=0;z.cooldown=1;}
   return true;
  }
@@ -108,7 +108,7 @@ function exitTower(){
 function nearbyLoot(){if(dungeonLevel>=0)return null;return loot.find(item=>Math.hypot(player.x-item.x,player.z-item.z)<1.7*limits().detect&&!obstacles.some(o=>{const dx=item.x-player.x,dz=item.z-player.z,d=Math.hypot(dx,dz);return d>.01&&rayBox(player.x,player.z,dx/d,dz/d,o)<d;}));}
 function interaction(){if(dungeonLevel>=0)return mortuaryAction()?.label.toUpperCase()||'';if(Math.hypot(player.x-TOWER.x,player.z-TOWER.z)<3)return hasExitKey?'UNLOCK THE MORTUARY':'MORTUARY LOCKED · NEED A KEY';const item=nearbyLoot();return !item?'':item.id==='exit-key'?'TAKE MORTUARY KEY':item.id==='flashlight'?'TAKE FLASHLIGHT':item.id==='health'?(player.health>=limits().health?'HEALTH FULL':'USE HEALTH BOX · +14 HP'):'TAKE '+WEAPONS[item.id].name.toUpperCase();}
 function interact(){if(!running||dead||paused||player.swing>=0||player.reload>0)return;if(dungeonLevel>=0){interactMortuary();return;}if(Math.hypot(player.x-TOWER.x,player.z-TOWER.z)<3){if(!hasExitKey){think('Locked. Of course it is.',true);return;}entryPrompt=true;paused=true;clearInput();$('towerPrompt').hidden=false;return;}const item=nearbyLoot();if(!item)return;if(item.id==='exit-key'){hasExitKey=true;loot=loot.filter(i=>i!==item);think('North. The mortuary door.',true);announce('MORTUARY KEY FOUND');return;}if(item.id==='flashlight'){player.flashlight=true;lightStamp=-1;loot=loot.filter(i=>i!==item);announce('FLASHLIGHT EQUIPPED · WIDER NIGHT VISIBILITY');return;}if(item.id==='health'){if(player.health>=limits().health)return;const restored=Math.min(HEALTH_BOX.heal,limits().health-player.health);player.health+=restored;loot=loot.filter(i=>i!==item);track('healthRecovered',restored);track('healthBoxes');persist();announce('HEALTH BOX · +'+restored+' HEALTH');sound('ready');return;}const w=WEAPONS[item.id];if(!inventory.includes(item.id))inventory.push(item.id);if(w.type==='gun')weaponAmmo[item.id]={loaded:Math.min(w.magazine,Math.ceil(w.magazine*.5)),reserve:Math.ceil(w.magazine*.5)};loot=loot.filter(i=>i!==item);track('items');persist();announce(w.name.toUpperCase()+' FOUND · Q TO SWITCH');}
-function damage(attacker){if(player.hurt>0||dead)return;const type=TYPES[attacker.kind];track('damageTaken',Math.min(player.health,type.damage));player.health=Math.max(0,player.health-type.damage);player.hurt=.55;think(['Ow. Still attached, I think.','Rude. Very rude.','That was my good everything.'][Math.floor(Math.random()*3)]);if(attacker.kind==='crawler')player.slow=1.4;if(attacker.kind==='brute'||attacker.kind==='wrecker'){const dx=player.x-attacker.x,dz=player.z-attacker.z,l=Math.hypot(dx,dz)||1;for(let i=0;i<8;i++)move(player,dx/l*.13,dz/l*.13);}sound('hit');if(player.health===0){persist();dead=true;running=false;deathTime=0;clearInput();$('nextWave').hidden=true;$('result').textContent=`${kills} kills · Wave ${wave} · ${Math.floor(elapsed/60)}m ${Math.floor(elapsed%60)}s survived`;$('crosshair').style.display='none';announce('OVERRUN');}}
+function damage(attacker){if(developerInvulnerable||player.hurt>0||dead)return;const type=TYPES[attacker.kind];track('damageTaken',Math.min(player.health,type.damage));player.health=Math.max(0,player.health-type.damage);player.hurt=.55;think(['Ow. Still attached, I think.','Rude. Very rude.','That was my good everything.'][Math.floor(Math.random()*3)]);if(attacker.kind==='crawler')player.slow=1.4;if(attacker.kind==='brute'||attacker.kind==='wrecker'){const dx=player.x-attacker.x,dz=player.z-attacker.z,l=Math.hypot(dx,dz)||1;for(let i=0;i<8;i++)move(player,dx/l*.13,dz/l*.13);}sound('hit');if(player.health===0){persist();dead=true;running=false;deathTime=0;clearInput();$('nextWave').hidden=true;$('result').textContent=`${kills} kills · Wave ${wave} · ${Math.floor(elapsed/60)}m ${Math.floor(elapsed%60)}s survived`;$('crosshair').style.display='none';announce('OVERRUN');}}
 function updateZombie(z,dt){
  z.moving=false;
  if(z.encounter==='dungeon'&&!z.awake){
@@ -333,3 +333,24 @@ function interactMortuary(){
 }
 $('cancelJump').onclick=()=>{jumpPrompt=false;paused=false;$('jumpPrompt').hidden=true;clearInput();};
 $('confirmJump').onclick=()=>{if(!jumpPrompt)return;jumpPrompt=false;paused=false;$('jumpPrompt').hidden=true;finishChapter();};
+
+function placeStarterPistol(){
+ // Choose a clear patch close to the actual starting grave, after outdoor collision resets.
+ for(const radius of [2,2.8,3.6])for(let i=0;i<16;i++){
+  const a=i*Math.PI/8,dx=Math.sin(a),dz=Math.cos(a),x=START.x+dx*radius,z=START.z+dz*radius;
+  if(blocked(x,z,.3)||obstacles.some(o=>rayBox(START.x,START.z,dx,dz,o)<radius))continue;
+  loot.push({id:'pistol',x,z});return;
+ }
+ // The player spawn itself is reachable if surrounding grave decorations leave no clear patch.
+ loot.push({id:'pistol',x:START.x,z:START.z});
+}
+function toggleInvulnerability(){
+ developerInvulnerable=!developerInvulnerable;
+ for(const id of ['developerInvulnerability','pauseInvulnerability']){
+  $(id).textContent='DEV INVULNERABILITY: '+(developerInvulnerable?'ON':'OFF');
+  $(id).setAttribute('aria-pressed',String(developerInvulnerable));
+ }
+ if(developerInvulnerable)player.slow=0;
+}
+$('developerInvulnerability').onclick=toggleInvulnerability;
+$('pauseInvulnerability').onclick=toggleInvulnerability;

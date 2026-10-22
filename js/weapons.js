@@ -29,4 +29,4 @@ export function createLoot(random=Math.random){
 }
 
 export const HEALTH_BOX={heal:14,chance:.02};
-export function rollHealthDrop(value=Math.random()){return value<HEALTH_BOX.chance;}
+export function rollHealthDrop(value=Math.random(),health=100){return value<(health<30?.12:HEALTH_BOX.chance); }
