@@ -35,3 +35,13 @@ footer{font:10px var(--hand);letter-spacing:0;gap:14px;align-items:center;flex-w
 @media(max-width:760px){#hud{padding:10px;gap:8px}.meters{gap:8px;padding:10px 10px 10px 35px}.meters:before{width:23px;left:5px}.meters>div{width:63px}.meters span{font-size:9px}.meters b{font-size:18px}.stats{gap:8px;padding:8px}.stats b{font-size:16px}#map{width:80px;height:80px;top:100px;right:12px}#objective{top:99px;left:12px;font-size:9px;max-width:60vw}.companion-note{grid-template-columns:80px 1fr;gap:12px;padding:16px}.companion-note img{width:80px;height:80px}.companion-note h2{font-size:20px}.companion-note p{font-size:12px}.notebook-margin{display:none}}
 @media(max-height:540px){.panel{padding-top:20px;padding-bottom:20px}.panel h1{font-size:32px}#companionDialogue{padding:12px}.companion-note{max-height:90dvh;overflow:auto}.companion-note img{width:90px;height:90px}.companion-note p{min-height:0;margin-bottom:8px}.companion-note{grid-template-columns:90px 1fr}}
 .hud-mode-help{display:block;font:10px/1.6 'Courier New',monospace;color:#766e58;margin:0 0 8px}
+/* Reveal the notes a little at a time in Story mode. */
+body[data-hud-stage="0"]:not(.hud-off) .meters{visibility:hidden}
+body[data-hud-stage="1"] .meters>div:nth-child(2){visibility:hidden}
+body[data-hud-stage="1"] .meters>div:nth-child(3),body[data-hud-stage="2"] .meters>div:nth-child(3){display:none}
+body[data-hud-stage="1"] .stats>span,body[data-hud-stage="2"] .stats>span,body[data-hud-stage="1"] #openJournal,body[data-hud-stage="2"] #openJournal{display:none}
+body[data-hud-stage="1"] #map,body[data-hud-stage="2"] #map,body[data-hud-stage="1"] #objective,body[data-hud-stage="2"] #objective,body[data-hud-stage="1"] footer,body[data-hud-stage="2"] footer{display:none}
+#companionDialogue{background:none;padding-bottom:32px}.companion-note{width:min(470px,94vw);grid-template-columns:78px 1fr;gap:12px;padding:16px 18px}.companion-note img{width:78px;height:78px}.companion-note h2{font-size:19px;margin:4px 0 7px}.companion-note p{font-size:13px;line-height:1.55;min-height:0;margin-bottom:10px}.companion-note .eyebrow,#companionCount{display:none}.companion-note button{font-size:12px}
+#playerThought{position:fixed;z-index:4;transform:translate(-50%,-100%);max-width:220px;width:max-content;padding:8px 12px;color:#44483c;background:#eee5d0ed;border:1px solid #827c66;border-radius:14px 11px 14px 8px;font:12px/1.5 var(--hand);text-align:center;pointer-events:none;box-shadow:1px 2px 0 #1c291b33}
+#playerThought:after{content:'';position:absolute;bottom:-8px;left:52%;width:6px;height:6px;border:1px solid #827c66;border-radius:50%;background:#eee5d0}
+#playerThought:before{content:'';position:absolute;bottom:-14px;left:49%;width:3px;height:3px;border-radius:50%;background:#eee5d0}

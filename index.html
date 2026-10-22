@@ -6,8 +6,8 @@
   <meta name="theme-color" content="#20241e">
   <meta name="description" content="Dead Lot — a browser-first zombie survival combat prototype.">
   <title>Death Comes After You · Part 1</title>
-  <link rel="stylesheet" href="style.css?v=notebook-1">
-  <link rel="stylesheet" href="notebook.css?v=1">
+  <link rel="stylesheet" href="style.css?v=undertaker-1">
+  <link rel="stylesheet" href="notebook.css?v=2">
 </head>
 <body class="hud-off">
   <canvas id="game" aria-label="3D zombie combat arena"></canvas>
@@ -18,13 +18,14 @@
     <div class="stats"><span>bell <b id="wave">00</b></span><span>laid to rest <b id="kills">0</b></span><button id="openJournal" aria-label="Stats and proficiency">notes</button><button id="pause" aria-label="Pause game">Ⅱ</button></div>
   </header>
   <div id="objective">SOUTH APPROACH · EXPLORE THE DISTRICT</div><canvas id="map" width="180" height="180" aria-label="Cemetery map: memorial, chapel, south gate and approaching enemies"></canvas><div id="announcement" aria-live="polite"></div>
+  <div id="playerThought" role="status" hidden></div>
   <div id="crosshair"><i></i></div>
   <footer><span id="status">PERIMETER QUIET</span><span id="cycleStatus">DAY · NO FLASHLIGHT</span><span id="needsStatus" aria-live="polite"></span><span id="perf">— FPS</span><span class="desktop-hint">WASD move · Mouse aim · Hold left click for quick swings · Hold/release right click or Space for heavy · Shift run · Esc pause</span></footer>
   <div id="touchControls"><div id="moveStick" class="stick"><span>MOVE</span><i></i></div><div id="aimStick" class="stick"><span>AIM / ATTACK</span><i></i></div><button id="touchReload">RELOAD</button><button id="touchWeapon">TO BAT</button><button id="touchHeavy">HOLD: HEAVY</button><button id="touchSprint">RUN</button></div>
   <button id="nextWave" class="primary floating" hidden>START WAVE 01 →</button>
   <button id="interact" class="primary floating" hidden>INTERACT [E]</button>
-  <div id="bossHud" hidden><span>THE WRECKER</span><progress id="bossHealth" max="65" value="65"></progress></div>
-  <section id="towerPrompt" class="overlay" hidden><div class="panel compact"><span class="eyebrow">NORTHWEST RESIDENCES</span><h2>Eight floors up.</h2><p>Entering commits you to the climb. Reach the rooftop to escape back to the district. Each room contains 1–4 zombies. Health and stamina carry between floors. Progress lasts for this run.</p><button id="enterTower" class="primary">ENTER THE TOWER →</button><button id="cancelTower">STAY OUTSIDE</button></div></section>
+  <div id="bossHud" hidden><span>THE UNDERTAKER</span><progress id="bossHealth" max="65" value="65"></progress></div>
+  <section id="towerPrompt" class="overlay" hidden><div class="panel compact"><span class="eyebrow">THE NORTHERN MORTUARY</span><h2>The key fits.</h2><p>The passage is blocked. Offices, stairs, and perhaps a way out on the upper floor.</p><button id="enterTower" class="primary">TURN THE KEY →</button><button id="cancelTower">NOT JUST YET</button></div></section>
   <section id="menu" class="overlay"><div class="panel">
     <span class="eyebrow">BLACKTHORN / FIELD NOTES No. 01</span><span class="notebook-margin" aria-hidden="true">keep going.</span><h1>Death comes<br>after you<span class="dot">.</span></h1><p class="pencil-subtitle">six bells &amp; a very bad morning</p>
     <p class="intro">Things I know: I am alive. The gate is locked.<br>Things to do: stay alive. Find a way out.</p>
@@ -51,14 +52,15 @@
   <section id="journal" class="overlay" hidden><div class="panel journal-panel"><span class="eyebrow">SURVIVOR’S JOURNAL</span><h2>Getting the hang of it.</h2><p id="saveNote"></p><div id="skillList"></div><h3>Food &amp; rest</h3><p>Each full day (12 active minutes) without eating or resting adds Hungry or Tired. Tired slows movement by 5%, 15%, 35%, then up to 75%. Hungry reduces stamina recovery by 3%, 9%, 21%, then up to 60%. Food and sleep arrive in chapter 2; this chapter has no food or rest actions. A new run resets both needs.</p><h3>Lifetime record</h3><p id="lifetimeStats"></p><h3>Equipment</h3><p id="inventoryList"></p><p>Q cycles carried weapons. E picks up nearby finds. Ammunition is finite. Search carefully: a few abandoned tools and rare weapons remain among the graves. Health boxes can occasionally be found on fallen enemies. Ranks, weapons and ammunition reset each run. A flashlight extends your visibility at night.</p><details><summary>Weapon field guide · base stats</summary><ul id="weaponList"></ul></details><button id="closeJournal" class="primary">CLOSE JOURNAL →</button></div></section>
   <section id="pauseMenu" class="overlay" hidden><div class="panel compact"><span class="eyebrow">TAKE A BREATH</span><h2>A moment, please.</h2><p>Nothing moves until you’re ready.</p><button id="resume" class="primary">BACK TO THE CEMETERY →</button><button id="pauseJournal">STATS / PROFICIENCY [P]</button><button id="pauseHudToggle">HUD: STORY</button><button id="pauseDeveloper">DEVELOPER MODE: OFF</button><button id="restartPaused">RESTART RUN</button></div></section>
   <section id="deathMenu" class="overlay" hidden><div class="panel compact"><span class="eyebrow">ANOTHER NAME IN STONE</span><h2>You went down.</h2><p id="result"></p><button id="restart" class="primary">TRY AGAIN →</button><button id="settings">BACK TO SETTINGS</button></div></section>
-  <section id="victoryMenu" class="overlay" hidden><div class="panel compact"><span class="eyebrow">THE SIXTH BELL FALLS SILENT</span><h2>Still breathing.</h2><p>You survived Blackthorn Cemetery.</p><p id="victoryResult"></p><button id="playAgain" class="primary">SURVIVE IT AGAIN →</button></div></section><section id="rotate"><span>↻</span><h2>Turn your phone sideways.</h2><p>This chapter is played in landscape.</p></section>
+  <section id="victoryMenu" class="overlay" hidden><div class="panel compact"><span class="eyebrow">BEYOND THE CEMETERY</span><h2>Still breathing.</h2><p>You escaped through the mortuary. The town lies ahead.</p><p id="victoryResult"></p><button id="playAgain" class="primary">SURVIVE IT AGAIN →</button></div></section><section id="rotate"><span>↻</span><h2>Turn your phone sideways.</h2><p>This chapter is played in landscape.</p></section>
   <section id="error" class="overlay" hidden><div class="panel"><h2>Unable to start</h2><p id="errorText"></p></div></section>
+  <section id="jumpPrompt" class="overlay" hidden><div class="panel compact"><span class="eyebrow">THE TOWN SIDE</span><h2>A way down.</h2><p>Below the broken window: a low annex roof, then the street. You can climb out and drop down. There will be no climbing back.</p><button id="confirmJump" class="primary">CLIMB OUT. DROP TO THE STREET. →</button><button id="cancelJump">LOOK AROUND A LITTLE LONGER</button></div></section>
   <section id="companionDialogue" role="dialog" aria-modal="true" aria-labelledby="companionName" hidden>
     <div class="companion-note"><img src="assets/companion-cthulhu.png" alt="A tiny green tentacled friend carrying a notebook and pencil" width="150" height="150">
-      <div><span class="eyebrow">a small, reassuring interruption</span><h2 id="companionName">A little company.</h2><p id="companionLine" aria-live="polite"></p><span id="companionCount"></span><button id="companionNext">Go on →</button><button id="companionSkip">Keep the notes. Let’s go.</button></div>
+      <div><span class="eyebrow">a little company</span><h2 id="companionName">A little company.</h2><p id="companionLine" aria-live="polite"></p><span id="companionCount"></span><button id="companionNext">Go on →</button><button id="companionSkip">Got it.</button></div>
     </div>
   </section>
-  <script type="module" src="js/game.js?v=notebook-1"></script>
+  <script type="module" src="js/game.js?v=puzzle-2"></script>
 </body></html>
 
 
